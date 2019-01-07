@@ -5,7 +5,7 @@
 </div>
 
 ### Try out here
-<https://cerlancism.github.io/Phaser-CE-TypeScript-ParcelJS/build/>
+<https://cerlancism.github.io/Building-Solids/>
 
 ## Features
 - Using [Parcel bundler](https://parceljs.org/) as a seamless and lightweight build tool.  
