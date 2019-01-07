@@ -1,30 +1,27 @@
 import { GameObject } from "/common/GameObject";
 import { GridBlock } from "./GridBlock";
+import { GridBase } from "./GridBase";
 
 export class BuildingGrid extends GameObject
 {
-    origin: GridBlock
-    extensions: GridBlock[] = []
+    origin: GridBase
+    extensions: GridBase[][] = []
     constructor(spreadSizeX: number, spreadSizeY: number)
     {
         super()
 
-        this.origin = new GridBlock()
-
-        for (let x = 1; x <= spreadSizeX; x++)
+        this.origin = new GridBase().cascade(x => this.add(x))
+        const gridCell = this.origin.gridCell
+        for (let x = 0; x < spreadSizeX; x++)
         {
-            for (let y = 0; y <= spreadSizeY; y++)
+            let row: GridBase[] = []
+            for (let y = 0; y < spreadSizeY; y++)
             {
-                this.extensions.push(new GridBlock().setPosition(0, y * this.origin.fullHeight))
-                this.extensions.push(new GridBlock().setPosition(0, -y * this.origin.fullHeight))
-                this.extensions.push(new GridBlock().setPosition(this.origin.fullWidth * x, y * this.origin.fullHeight))
-                this.extensions.push(new GridBlock().setPosition(-this.origin.fullWidth * x, y * this.origin.fullHeight))
-                this.extensions.push(new GridBlock().setPosition(this.origin.fullWidth * x, -y * this.origin.fullHeight))
-                this.extensions.push(new GridBlock().setPosition(-this.origin.fullWidth * x, -y * this.origin.fullHeight))
+                row.push(new GridBase().setPosition(gridCell.fullWidth * x, gridCell.sideLength * y))
+                y < (spreadSizeY - 1) && x < (spreadSizeX - 1) && row.push(new GridBase().setPosition(gridCell.bottonRight.x + gridCell.fullWidth * x, gridCell.bottonRight.y + gridCell.sideLength * y))
             }
+            this.extensions.push(row)
+            this.extensions.reverse().forEach(x => x.forEach(y => this.addChild(y)))
         }
-
-        this.addChild(this.origin)
-        this.extensions.forEach(x => this.addChild(x))
     }
 }
