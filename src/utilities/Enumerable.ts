@@ -11,7 +11,7 @@ module Enumberable
         }, []);
     }
 
-    export function repeat<T>(value: T, count: number)
+    export function repeat<T>(value: T, count: number): T[]
     {
         return Array(count).fill(value);
     }
