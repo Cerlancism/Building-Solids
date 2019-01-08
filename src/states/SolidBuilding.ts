@@ -1,6 +1,6 @@
 import { GameAssetKeys } from "/assets"
-import { BuildingGrid } from "../componenets/BuildingGrid";
-import { GridBlock } from "/componenets/GridBlock";
+import { BuildingGrid } from "../components/IsometricGridSystem/BuildingGrid";
+import { GridConfig } from "/components/IsometricGridSystem/entities/GridConfig";
 
 export class SolidBuilding extends Phaser.State
 {
@@ -12,9 +12,7 @@ export class SolidBuilding extends Phaser.State
 
     create()
     {
-        this.grid = new BuildingGrid(9, 13).setPosition(50, 125)
-
-        this.grid.addBlock(this.grid.gridCenter)
+        this.grid = new BuildingGrid(9, 13, new GridConfig(30)).setPosition(50, 125)
     }
 
     update()

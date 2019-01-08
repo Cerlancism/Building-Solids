@@ -1,4 +1,4 @@
-import { GridCell } from "./GridCell";
+import { GridCell } from "./entities/GridCell";
 import { GameObject } from "/common/GameObject";
 
 export class GridSkeleton extends GameObject

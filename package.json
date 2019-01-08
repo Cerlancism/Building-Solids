@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "c": "^0.1.0",
     "global": "^4.3.2",
     "phaser-ce": "^2.11.1"
   }

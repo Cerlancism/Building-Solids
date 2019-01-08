@@ -31,7 +31,7 @@ async function startGame()
                 antialias: true,
                 resolution: 1,
                 maxPointers: 1,
-                backgroundColor: '#EEEEEE',
+                backgroundColor: '#FFFFFF',
                 state: Boot
             }
 
