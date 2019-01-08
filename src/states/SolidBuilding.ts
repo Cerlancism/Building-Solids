@@ -1,18 +1,24 @@
 import { GameAssetKeys } from "/assets"
 import { BuildingGrid } from "../components/IsometricGridSystem/BuildingGrid";
-import { GridConfig } from "/components/IsometricGridSystem/entities/GridConfig";
+import { GridContext } from "../components/IsometricGridSystem/entities/GridContext";
+import { VectorIso3 } from "/components/IsometricGridSystem/entities/VectorIso3";
 
 export class SolidBuilding extends Phaser.State
 {
+    public static key = "SolidBuilding"
+
     grid: BuildingGrid;
+
     init()
     {
-        console.log("Main State", this.key)
+        debugLog(this.key, "State Init")
     }
 
     create()
     {
-        this.grid = new BuildingGrid(9, 13, new GridConfig(30)).setPosition(50, 125)
+        this.grid = new BuildingGrid(new GridContext(30), 5, 5).setPosition(this.world.centerX, this.world.centerY)
+
+        this.grid.addBlock(new VectorIso3(0, 0))
     }
 
     update()

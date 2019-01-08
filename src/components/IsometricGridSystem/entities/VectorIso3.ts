@@ -3,8 +3,11 @@ const SQRT_6 = Math.sqrt(6)
 
 export class VectorIso3
 {
+    /** On ground plane, from origin to top right */
     x: number
+    /** On ground plane, from origin to top left */
     y: number
+    /** The vertical height */
     z: number
 
     constructor(x: number, y: number, z: number = 0)
@@ -22,35 +25,49 @@ export class VectorIso3
         return new Phaser.Point(x * multiplier, y * multiplier)
     }
 
-    add(value: VectorIso3)
+    public add(value: VectorIso3)
     {
         const { x, y, z } = value;
         return new VectorIso3(this.x + x, this.y + y, this.z + z)
     }
 
-    substract(value: VectorIso3)
+    public substract(value: VectorIso3)
     {
         const { x, y, z } = value;
         return new VectorIso3(this.x - x, this.y - y, this.z - z)
     }
 
-    multiply(value: number)
+    public multiply(value: number)
     {
         return new VectorIso3(this.x * value, this.y * value, this.z * value)
     }
 
-    cascade(setter: (self: this) => void)
+    public cascade(setter: (self: this) => void)
     {
         setter(this)
         return this
     }
 
-    equals(position: VectorIso3)
+    public round(precision: number)
+    {
+        function precisionRound(value: number)
+        {
+            return Math.round(value * (1 / precision)) / (1 / precision);
+        }
+        return new VectorIso3(precisionRound(this.x), precisionRound(this.y), precisionRound(this.z))
+    }
+
+    public equals(position: VectorIso3)
     {
         return this.x === position.x && this.y === position.y && this.z === position.z
     }
 
-    toString()
+    public fuzzyEquals(position: VectorIso3, precision: number)
+    {
+        return this.round(precision).equals(position.round(precision))
+    }
+
+    public toString()
     {
         return JSON.stringify(this)
     }

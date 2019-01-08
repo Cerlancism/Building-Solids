@@ -1,15 +1,18 @@
 import { UIKeys, GameAssetValues, GameAssetKeys } from "/assets"
-import { SolidBuilding } from "./SolidBuilding"
 
 export class Preloader extends Phaser.State
 {
+    public static key = "Preloader"
+    public static onCreate = new Phaser.Signal()
+
     preloadBar: Phaser.Sprite
     preloadText: Phaser.Text
 
     init()
     {
-        console.log("State", this.key)
-        console.log("KeyValues", GameAssetValues, "Keys", GameAssetKeys)
+        debugLog(this.key, "State Init")
+        debugLog(GameAssetValues, "Game Assets")
+        debugLog(GameAssetKeys, "Game Assets Keys")
     }
 
     preload()
@@ -29,7 +32,8 @@ export class Preloader extends Phaser.State
 
     create()
     {
-        console.log("Load Complete")
-        this.state.start(SolidBuilding.name)
+        infoLog("Load Complete")
+
+        Preloader.onCreate.dispatch()
     }
 }

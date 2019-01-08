@@ -1,36 +1,39 @@
-import { GameObject } from "/common/GameObject";
+import { IBuildingGrid } from "./core/IBuildingGrid";
+import { IGridBase } from "./core/IGridBase";
+import { IGridBlock } from "./core/IGridBlock";
+import { IGridCell } from "./core/IGridCell";
+import { IGridContext } from "./core/IGridContext";
 import { VectorIso3 } from "./entities/VectorIso3";
-import { GridConfig } from "./entities/GridConfig";
-import { GridCell } from "./entities/GridCell";
 import { GridBase } from "./GridBase";
 import { GridBlock } from "./GridBlock";
+import { GridDots } from "./GridDots";
+import { GameObject } from "/components/GameObject";
 
-export class BuildingGrid extends GameObject
+export class BuildingGrid extends GameObject implements IBuildingGrid
 {
-    origin: GridBase
-    extensions: GridBase[][] = []
-    extensionsFlat: GridBase[]
-    blocks: GridBlock[] = []
-    gridCell: GridCell
+    public readonly extensionsFlat: IGridBase[]
+    public readonly blocks: IGridBlock[] = []
+    public readonly gridCell: IGridCell
+    public readonly gridDots: GridDots
 
-    constructor(spreadSizeX: number, spreadSizeY: number, gridConfig: GridConfig)
+    private readonly extensions: IGridBase[][] = []
+
+    constructor(gridContext: IGridContext, spreadSizeX: number, spreadSizeY: number)
     {
         super()
-
-        this.origin = new GridBase(gridConfig).cascade(x => this.add(x))
-        const gridCell = this.gridCell = gridConfig.gridCell
+        const gridCell = this.gridCell = gridContext.gridCell
 
         for (let x = 0; x < spreadSizeX; x++)
         {
             let row: GridBase[] = []
             for (let y = 0; y < spreadSizeY; y++)
             {
-                row.push(new GridBase(gridConfig)
+                row.push(new GridBase(gridContext)
                     .setPosition(gridCell.fullWidth * x, gridCell.sideLength * y)
                     .cascade(z => z.gridPosition = new VectorIso3(x + y, -y + x)))
                 y < (spreadSizeY - 1)
                     && x < (spreadSizeX - 1)
-                    && row.push(new GridBase(gridConfig)
+                    && row.push(new GridBase(gridContext)
                         .setPosition(gridCell.bottonRight.x + gridCell.fullWidth * x, gridCell.bottonRight.y + gridCell.sideLength * y)
                         .cascade(z => z.gridPosition = new VectorIso3(x + 1 + y, - y + x)))
             }
@@ -39,6 +42,18 @@ export class BuildingGrid extends GameObject
         }
 
         this.extensionsFlat = this.extensions.flat()
+
+        this.gridDots = new GridDots(gridContext, this.extensionsFlat).withParent(this)
+
+        gridContext.onGridHover.add(() => 
+        {
+            this.extensionsFlat.forEach(x => x.ensurePointerHover())
+        })
+
+        gridContext.onGridClick.add(() => 
+        {
+            this.extensionsFlat.forEach(x => x.ensurePointerClick())
+        })
     }
 
     get gridCenter()
@@ -52,10 +67,19 @@ export class BuildingGrid extends GameObject
 
     addBlock(position: VectorIso3)
     {
-        const targetPosition = this.getBase(position).position
-        this.blocks.push(new GridBlock(0, this.gridCell.sideLength, 1)
-            .cascade(x => this.addChild(x))
-            .setPosition(targetPosition.x, targetPosition.y))
+        const base = this.getBase(position)
+
+        if (base)
+        {
+            const targetPosition = base.position
+            this.blocks.push(new GridBlock(0, this.gridCell.sideLength, 1)
+                .withParent(this)
+                .setPosition(targetPosition.x, targetPosition.y))
+        }
+        else
+        {
+            debugLog(`Invalid grid position: ${position}`, "WARNING")
+        }
         return this
     }
 

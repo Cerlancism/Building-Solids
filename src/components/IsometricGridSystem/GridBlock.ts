@@ -1,9 +1,9 @@
-import { GameObject } from "/common/GameObject";
+import { GameObject } from "/components/GameObject";
 import { GridSkeleton } from "./GridSkeleton";
 
 export class GridBlock extends GameObject
 {
-    blockDraw: GridSkeleton
+    private blockDraw: GridSkeleton
 
     constructor(
         public readonly diameter = 5,
@@ -12,7 +12,6 @@ export class GridBlock extends GameObject
     )
     {
         super()
-        this.blockDraw = new GridSkeleton(diameter, sideLength, lineWidth)
-            .cascade(x => this.add(x))
+        this.blockDraw = new GridSkeleton(diameter, sideLength, lineWidth).withParent(this)
     }
 }

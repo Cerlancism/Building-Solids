@@ -1,7 +1,16 @@
 import 'babel-polyfill'
 import '/global'
 
-const { Boot, Preloader, SolidBuilding } = require("/states")
+const { Boot, Preloader, SolidBuilding } = require<{ [keys in any]: { new(): Phaser.State } & { key: string, onCreate: Phaser.Signal } }>("/states")
+
+window.PROJECT_CODE = "BUILDING_SOLIDS"
+
+const buildNumberPropertyName = PROJECT_CODE + "_BuildNumber"
+const buildNumber = (JSON.parse(localStorage.getItem(buildNumberPropertyName)) || 0) as number + 1
+
+console.info(`%c[${PROJECT_CODE}] %cBuild:${buildNumber}`, "color:yellow", "color:blue; font-size:36px; font-weight:bold")
+
+localStorage.setItem(buildNumberPropertyName, JSON.stringify(buildNumber))
 
 !(async () =>
 {
@@ -17,7 +26,7 @@ async function startGame()
     {
         Phaser.Device.whenReady((device: Phaser.Device) =>
         {
-            console.log("Device Ready")
+            infoLog("Device Ready")
             const isOffline = location.protocol === "file:"
 
             const config: Phaser.IGameConfig =
@@ -35,11 +44,24 @@ async function startGame()
                 state: Boot
             }
 
-            document.querySelector<HTMLDivElement>("#content").style.setProperty("visibility", "hidden")
+            const container = document.querySelector<HTMLDivElement>("#content")
+            container.style.setProperty("visibility", "hidden")
 
             const game = new Phaser.Game(config)
-            game.state.add(Preloader.name, Preloader)
-            game.state.add(SolidBuilding.name, SolidBuilding)
+
+            game.state.add(Preloader.key, Preloader)
+            game.state.add(SolidBuilding.key, SolidBuilding)
+
+            Boot.onCreate.addOnce(() =>
+            {
+                game.state.start(Preloader.key)
+                container.style.removeProperty("visibility")
+            })
+
+            Preloader.onCreate.addOnce(() =>
+            {
+                game.state.start(SolidBuilding.key)
+            })
 
             resolve(game)
         })
@@ -55,6 +77,13 @@ if (module.hot)
 function destroyGame()
 {
     console.log("[HMR] Destroy Game")
-    window.GameInstance.destroy()
-    window.GameInstance = null
+    if (window.GameInstance)
+    {
+        window.GameInstance.destroy()
+        window.GameInstance = null
+    }
+    else
+    {
+        location.reload()
+    }
 }

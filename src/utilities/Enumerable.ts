@@ -3,14 +3,6 @@
  */
 module Enumberable
 {
-    export function flatten<T>(arr: T[][]): T[]
-    {
-        return arr.reduce(function (flat, toFlatten)
-        {
-            return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten as any) : toFlatten);
-        }, []);
-    }
-
     export function repeat<T>(value: T, count: number): T[]
     {
         return Array(count).fill(value);

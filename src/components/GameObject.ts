@@ -28,4 +28,10 @@ export class GameObject extends Phaser.Group
     {
         return this.cascade(z => z.position.set(x, y))
     }
+
+    public withParent(parent: { add: typeof Phaser.Group.prototype.add })
+    {
+        parent.add(this)
+        return this
+    }
 }

@@ -1,8 +1,10 @@
+import { IGridCell } from "../core/IGridCell";
+
 const ISO_ANGLE = Math.PI / 6
 const X_LENGTH = Math.cos(ISO_ANGLE)
 const Y_LENGTH = Math.sin(ISO_ANGLE)
 
-export class GridCell
+export class GridCell implements IGridCell
 {
     private readonly xTarget: number
     private readonly yTarget: number

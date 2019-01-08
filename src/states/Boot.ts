@@ -1,11 +1,12 @@
 import { UIKeyValues, UIKeys } from "/assets"
-import { Preloader } from "./Preloader"
 
 export class Boot extends Phaser.State
 {
+    public static onCreate = new Phaser.Signal()
+
     init()
     {
-        console.log("State", this.key)
+        debugLog(this.key, "State Init")
         this.input.maxPointers = 1
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL
         this.scale.setMinMax(320, 240, 1280, 960)
@@ -21,7 +22,6 @@ export class Boot extends Phaser.State
 
     create()
     {
-        this.game.canvas.parentElement.style.removeProperty("visibility")
-        this.state.start(Preloader.name)
+        Boot.onCreate.dispatch()
     }
 }

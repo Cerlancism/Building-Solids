@@ -1,5 +1,5 @@
 import { GridCell } from "./entities/GridCell";
-import { GameObject } from "/common/GameObject";
+import { GameObject } from "/components/GameObject";
 
 export class GridSkeleton extends GameObject
 {
@@ -7,9 +7,9 @@ export class GridSkeleton extends GameObject
     graphic: Phaser.Graphics
 
     constructor(
-        public readonly diameter,
-        public readonly sideLength,
-        public readonly lineWidth
+        public readonly diameter: number,
+        public readonly sideLength: number,
+        public readonly lineWidth: number
     )
     {
         super()
