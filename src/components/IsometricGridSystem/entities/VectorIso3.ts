@@ -1,11 +1,12 @@
-const SQRT_2 = Math.sqrt(2)
-const SQRT_6 = Math.sqrt(6)
+const ISO_ANGLE = Math.PI / 6
+const X_LENGTH = Math.cos(ISO_ANGLE)
+const Y_LENGTH = Math.sin(ISO_ANGLE)
 
 export class VectorIso3
 {
-    /** On ground plane, from origin to top right */
+    /** On ground plane, from origin to botton right */
     x: number
-    /** On ground plane, from origin to top left */
+    /** On ground plane, from origin to botton left */
     y: number
     /** The vertical height */
     z: number
@@ -19,8 +20,8 @@ export class VectorIso3
 
     public to2D(multiplier = 1)
     {
-        const x = (this.x - this.y) / SQRT_2
-        const y = (this.x + 2 * this.z + this.y) / SQRT_6
+        const x = (this.x - this.y) * X_LENGTH
+        const y = (this.x - (2 * this.z) + this.y) * Y_LENGTH
 
         return new Phaser.Point(x * multiplier, y * multiplier)
     }

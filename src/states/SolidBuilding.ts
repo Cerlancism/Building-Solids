@@ -16,7 +16,7 @@ export class SolidBuilding extends Phaser.State
 
     create()
     {
-        this.grid = new BuildingGrid(new GridContext(30), 5, 5).setPosition(this.world.centerX, this.world.centerY)
+        this.grid = new BuildingGrid(new GridContext(50), 10, 10).setPosition(this.world.centerX, 50)
 
         this.grid.addBlock(new VectorIso3(0, 0))
     }

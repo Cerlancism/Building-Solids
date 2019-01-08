@@ -16,32 +16,29 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     public readonly gridCell: IGridCell
     public readonly gridDots: GridDots
 
-    private readonly extensions: IGridBase[][] = []
-
     constructor(gridContext: IGridContext, spreadSizeX: number, spreadSizeY: number)
     {
         super()
         const gridCell = this.gridCell = gridContext.gridCell
 
-        for (let x = 0; x < spreadSizeX; x++)
-        {
-            let row: GridBase[] = []
-            for (let y = 0; y < spreadSizeY; y++)
-            {
-                row.push(new GridBase(gridContext)
-                    .setPosition(gridCell.fullWidth * x, gridCell.sideLength * y)
-                    .cascade(z => z.gridPosition = new VectorIso3(x + y, -y + x)))
-                y < (spreadSizeY - 1)
-                    && x < (spreadSizeX - 1)
-                    && row.push(new GridBase(gridContext)
-                        .setPosition(gridCell.bottonRight.x + gridCell.fullWidth * x, gridCell.bottonRight.y + gridCell.sideLength * y)
-                        .cascade(z => z.gridPosition = new VectorIso3(x + 1 + y, - y + x)))
-            }
-            this.extensions.push(row)
-            this.extensions.reverse().forEach(x => x.forEach(y => this.addChild(y)))
-        }
+        const coordinates = Enumberable.range(0, spreadSizeX)
+            .map(x => Enumberable.range(0, spreadSizeY)
+                .map(y =>
+                {
+                    const coordinate = new VectorIso3(x, y)
+                    return ({ local: coordinate, screen: coordinate.to2D(gridCell.sideLength) });
+                }))
+            .flat()
+            .concat(Enumberable.range(0, spreadSizeX / 2)
+                .map(x => Enumberable.range(0, spreadSizeY / 2)
+                    .map(y =>
+                    {
+                        const coordinate = new VectorIso3(x, y, 1)
+                        return ({ local: coordinate, screen: coordinate.to2D(gridCell.sideLength) });
+                    }))
+                .flat())
 
-        this.extensionsFlat = this.extensions.flat()
+        this.extensionsFlat = coordinates.map(x => new GridBase(gridContext, x.local).setPosition(x.screen.x, x.screen.y).withParent(this))
 
         this.gridDots = new GridDots(gridContext, this.extensionsFlat).withParent(this)
 

@@ -9,12 +9,13 @@ const DEFAULT = 0.15
 export class GridBase extends GameObject implements IGridBase
 {
     public block: GridBlock;
-    public gridPosition: VectorIso3
 
     private graphics: Phaser.Sprite;
 
     constructor(
-        private readonly gridContext: IGridContext)
+        private readonly gridContext: IGridContext,
+        public readonly gridPosition: VectorIso3
+    )
     {
         super()
 
@@ -75,6 +76,7 @@ export class GridBase extends GameObject implements IGridBase
         {
             return
         }
+        debugLog(`Clicked ${this.gridPosition}`)
         this.graphics.alpha = this.graphics.alpha == 1 ? 0.5 : 1
     }
 }
