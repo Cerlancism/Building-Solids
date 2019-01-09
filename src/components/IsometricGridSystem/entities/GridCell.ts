@@ -1,8 +1,5 @@
 import { IGridCell } from "../core/IGridCell";
-
-const ISO_ANGLE = Math.PI / 6
-const X_LENGTH = Math.cos(ISO_ANGLE)
-const Y_LENGTH = Math.sin(ISO_ANGLE)
+import { X_POJECTON, Y_PROJECTION } from '/components/IsometricGridSystem/entities/VectorIso3'
 
 export class GridCell implements IGridCell
 {
@@ -22,8 +19,8 @@ export class GridCell implements IGridCell
         public readonly sideLength: number,
     )
     {
-        this.xTarget = X_LENGTH * this.sideLength
-        this.yTarget = Y_LENGTH * this.sideLength
+        this.xTarget = X_POJECTON * this.sideLength
+        this.yTarget = Y_PROJECTION * this.sideLength
 
         this.topLeft = new Phaser.Point(-this.xTarget, -this.yTarget)
         this.topRight = new Phaser.Point(this.xTarget, -this.yTarget)

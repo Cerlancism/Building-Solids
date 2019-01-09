@@ -1,6 +1,6 @@
-const ISO_ANGLE = Math.PI / 6
-const X_LENGTH = Math.cos(ISO_ANGLE)
-const Y_LENGTH = Math.sin(ISO_ANGLE)
+export const ISO_ANGLE = Math.PI / 6
+export const X_POJECTON = Math.cos(ISO_ANGLE)
+export const Y_PROJECTION = Math.sin(ISO_ANGLE)
 
 export class VectorIso3
 {
@@ -20,8 +20,8 @@ export class VectorIso3
 
     public to2D(multiplier = 1)
     {
-        const x = (this.x - this.y) * X_LENGTH
-        const y = (this.x - (2 * this.z) + this.y) * Y_LENGTH
+        const x = (this.x - this.y) * X_POJECTON
+        const y = (this.x - (2 * this.z) + this.y) * Y_PROJECTION
 
         return new Phaser.Point(x * multiplier, y * multiplier)
     }

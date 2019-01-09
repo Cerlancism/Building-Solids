@@ -57,16 +57,18 @@ export class GridBase extends GameObject implements IGridBase
     {
         if (this.graphics.alpha == 1)
         {
-            return
+            return false
         }
         if (this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
         {
 
             this.graphics.alpha = 0.5
+            return true
         }
         else
         {
             this.graphics.alpha = DEFAULT
+            return false
         }
     }
 
@@ -74,9 +76,10 @@ export class GridBase extends GameObject implements IGridBase
     {
         if (!this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
         {
-            return
+            return false
         }
         debugLog(`Clicked ${this.gridPosition}`)
         this.graphics.alpha = this.graphics.alpha == 1 ? 0.5 : 1
+        return true
     }
 }
