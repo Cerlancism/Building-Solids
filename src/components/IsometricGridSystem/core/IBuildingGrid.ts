@@ -12,6 +12,7 @@ export interface IBuildingGrid extends GameObject
     readonly gridDots: Phaser.Group
 
     readonly gridCenter: VectorIso3
+    readonly minMax: { minX: VectorIso3, minY: VectorIso3, maxX: VectorIso3, maxY: VectorIso3 }
 
     addBlock(position: VectorIso3): this
     getBase(position: VectorIso3): IGridBase

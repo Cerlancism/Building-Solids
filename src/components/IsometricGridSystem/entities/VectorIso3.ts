@@ -38,6 +38,16 @@ export class VectorIso3
         return new VectorIso3(this.x - x, this.y - y, this.z - z)
     }
 
+    public setValueAt(x?: number, y?: number, z?: number)
+    {
+        return new VectorIso3(x == undefined ? this.x : x, y == undefined ? this.y : y, z == undefined ? this.z : z)
+    }
+
+    public offSetValueAt(x: number = 0, y: number = 0, z: number = 0)
+    {
+        return new VectorIso3(this.x + x, this.y + y, this.z + z)
+    }
+
     public multiply(value: number)
     {
         return new VectorIso3(this.x * value, this.y * value, this.z * value)

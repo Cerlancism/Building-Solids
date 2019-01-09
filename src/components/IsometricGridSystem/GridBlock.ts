@@ -7,7 +7,8 @@ export class GridBlock extends GameObject implements IGridBlock
     private blockDraw: Phaser.Sprite
 
     constructor(
-        gridContext: IGridContext
+        gridContext: IGridContext,
+        public readonly gridPosition
     )
     {
         super()
