@@ -7,6 +7,6 @@ export interface IGridBase extends GameObject
     block: IGridBlock;
     gridPosition: VectorIso3
 
-    ensurePointerHover(): boolean
-    ensurePointerClick(): boolean
+    ensurePointerHover(): VectorIso3
+    ensurePointerClick(): VectorIso3
 }

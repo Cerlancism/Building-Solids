@@ -1,17 +1,17 @@
 import { GameObject } from "/components/GameObject";
-import { GridSkeleton } from "./GridSkeleton";
+import { IGridBlock } from "./core/IGridBlock";
+import { IGridContext } from "./core/IGridContext";
 
-export class GridBlock extends GameObject
+export class GridBlock extends GameObject implements IGridBlock
 {
-    private blockDraw: GridSkeleton
+    private blockDraw: Phaser.Sprite
 
     constructor(
-        public readonly diameter = 5,
-        public readonly sideLength = 30,
-        public readonly lineWidth = 0,
+        gridContext: IGridContext
     )
     {
         super()
-        this.blockDraw = new GridSkeleton(diameter, sideLength, lineWidth).withParent(this)
+        this.blockDraw = this.create(0, 0, gridContext.blockTexture)
+        this.blockDraw.anchor.set(0.5)
     }
 }

@@ -28,8 +28,6 @@ export class GridBase extends GameObject implements IGridBase
         this.graphics.events.onInputOver.add((x: Phaser.Graphics) => this.handleInputOver(x))
         this.graphics.events.onInputOut.add((x: Phaser.Graphics) => this.handleInputOut(x))
         this.graphics.events.onInputUp.add((x: Phaser.Graphics, pointer: Phaser.Pointer, over: boolean) => this.handleInputUp(x, pointer, over))
-
-
         this.graphics.alpha = DEFAULT
     }
 
@@ -57,18 +55,18 @@ export class GridBase extends GameObject implements IGridBase
     {
         if (this.graphics.alpha == 1)
         {
-            return false
+            return null
         }
         if (this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
         {
 
             this.graphics.alpha = 0.5
-            return true
+            return this.gridPosition
         }
         else
         {
             this.graphics.alpha = DEFAULT
-            return false
+            return null
         }
     }
 
@@ -76,10 +74,10 @@ export class GridBase extends GameObject implements IGridBase
     {
         if (!this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
         {
-            return false
+            return null
         }
         debugLog(`Clicked ${this.gridPosition}`)
         this.graphics.alpha = this.graphics.alpha == 1 ? 0.5 : 1
-        return true
+        return this.gridPosition
     }
 }
