@@ -1,7 +1,7 @@
 import { VectorIso3 } from "../entities/VectorIso3";
 import { IGridBase } from "./IGridBase";
 import { IGridCell } from "./IGridCell";
-import { GameObject } from "/components/GameObject";
+import { GameObject } from "../../../extensions/phaser/GameObject";
 import { IGridBlock } from "./IGridBlock";
 
 export interface IBuildingGrid extends GameObject

@@ -1,23 +1,22 @@
-import { GameObject } from "/components/GameObject";
 import { GridBlock } from "./GridBlock";
 import { VectorIso3 } from "./entities/VectorIso3";
 import { IGridContext } from "./core/IGridContext";
-import { IGridBase } from "./core/IGridBase";
+import { GridObject } from "./base/GridObject";
 
 const DEFAULT = 0.15
 
-export class GridBase extends GameObject implements IGridBase
+export class GridBase extends GridObject
 {
     public block: GridBlock;
 
     private graphics: Phaser.Sprite;
 
     constructor(
-        private readonly gridContext: IGridContext,
-        public readonly gridPosition: VectorIso3
+        gridContext: IGridContext,
+        gridPosition: VectorIso3
     )
     {
-        super()
+        super(gridContext, gridPosition)
 
         this.graphics = this.create(0, 0, gridContext.baseTexture)
         this.graphics.anchor.set(0.5, 0)
@@ -29,6 +28,11 @@ export class GridBase extends GameObject implements IGridBase
         this.graphics.events.onInputOut.add((x: Phaser.Graphics) => this.handleInputOut(x))
         this.graphics.events.onInputUp.add((x: Phaser.Graphics, pointer: Phaser.Pointer, over: boolean) => this.handleInputUp(x, pointer, over))
         this.graphics.alpha = DEFAULT
+    }
+
+    get screenPosition()
+    {
+        return this.position
     }
 
     private handleInputUp(x: Phaser.Graphics, pointer: Phaser.Pointer, over: boolean)

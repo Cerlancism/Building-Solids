@@ -9,7 +9,7 @@ import { VectorIso3 } from "./entities/VectorIso3";
 import { GridBase } from "./GridBase";
 import { GridBlock } from "./GridBlock";
 import { GridDots } from "./GridDots";
-import { GameObject } from "/components/GameObject";
+import { GameObject } from "../../extensions/phaser/GameObject";
 
 export class BuildingGrid extends GameObject implements IBuildingGrid
 {
@@ -21,17 +21,20 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     public readonly minMax: { minX: VectorIso3; minY: VectorIso3; maxX: VectorIso3; maxY: VectorIso3 }
     public readonly gridCenter: VectorIso3
 
-    constructor(private readonly gridContext: IGridContext, spreadSizeX: number, spreadSizeY: number)
+    constructor(
+        private readonly gridContext: IGridContext,
+        spreadSizeX: number,
+        spreadSizeY: number)
     {
         super()
         const gridCell = this.gridCell = gridContext.gridCell
 
         const totalRange = Enumerable.range(0, spreadSizeX + spreadSizeY - 1)
 
-        const oddMore = (x: number) => x * 2 + 1
-        const rowTarget = (x: number) => Math.min(oddMore(x), rowMax)
+        const oddPlus = (x: number) => Functors.odd(x, 1)
+        const rowTarget = (x: number) => Math.min(oddPlus(x), rowMax)
 
-        const rowMax = totalRange.map(oddMore)[Math.min(spreadSizeX, spreadSizeY) - 1]
+        const rowMax = totalRange.map(oddPlus)[Math.min(spreadSizeX, spreadSizeY) - 1]
         const rows = totalRange.map(rowTarget)
             .reverse()
             .map((x, i) => x == rowMax ? rowTarget(i) : x)
@@ -46,10 +49,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             })
         )
 
-        this.gridBases = coordinates.flatMap(f => f.map(x => new GridBase(gridContext, x.grid)
-            .setPosition(x.screen.x, x.screen.y)
-            .withParent(this)
-        ))
+        this.gridBases = coordinates.flatMap(f => f.map(x => new GridBase(gridContext, x.grid).withParent(this)))
 
         this.gridDots = new GridDots(gridContext, this.gridBases).withParent(this)
 
@@ -72,19 +72,19 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             }
         })
 
+        const getGridMinMax = (
+            selector: Functors.Selector<IGridBase, number>,
+            comparer: Functors.Comparer<number>
+        ) => this.gridBases.reduce(Functors.getMinMax(selector, comparer)).gridPosition
 
-        const getMinMax = <T>(selector: (x: T) => number, comparer: (x: number, y: number) => boolean) => (x: T, y: T) => comparer(selector(x), selector(y)) ? x : y
-        const reducer = (selector: (x: IGridBase) => number, comparer: (x: number, y: number) => boolean) => this.gridBases.reduce(getMinMax(selector, comparer)).gridPosition
-        const [gridX, gridY] = [<T extends IGridObject>(x: T) => x.gridPosition.x, <T extends IGridObject>(x: T) => x.gridPosition.y]
-        const [moreThan, LessThan] = [(x: number, y: number) => x > y, (x: number, y: number) => x < y]
+        const [selectGridX, selectGridY] = [<T extends IGridObject>(x: T) => x.gridPosition.x, <T extends IGridObject>(x: T) => x.gridPosition.y]
 
-        this.minMax =
-            {
-                maxX: reducer(gridX, moreThan),
-                minX: reducer(gridX, LessThan),
-                maxY: reducer(gridY, moreThan),
-                minY: reducer(gridY, LessThan)
-            }
+        this.minMax = {
+            maxX: getGridMinMax(selectGridX, Functors.moreThan),
+            minX: getGridMinMax(selectGridX, Functors.lessThan),
+            maxY: getGridMinMax(selectGridY, Functors.moreThan),
+            minY: getGridMinMax(selectGridY, Functors.lessThan)
+        }
 
         this.gridCenter = new VectorIso3((this.minMax.maxX.x + this.minMax.minX.x) / 2, (this.minMax.maxY.y + this.minMax.minY.y) / 2).round(1)
 
@@ -98,12 +98,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
 
         if (base)
         {
-            const targetPosition = base.position
-
-            const block = new GridBlock(this.gridContext, base.gridPosition)
-                .withParent(this)
-                .setPosition(targetPosition.x, targetPosition.y)
-
+            const block = new GridBlock(this.gridContext, base.gridPosition).withParent(this)
             this.blocks.push(block)
             this.sortBlocks()
         }

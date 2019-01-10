@@ -11,7 +11,7 @@ export class VectorIso3
     /** The vertical height */
     z: number
 
-    constructor(x: number, y: number, z: number = 0)
+    constructor(x: number = 0, y: number = x, z: number = 0)
     {
         this.x = x
         this.y = y
@@ -38,9 +38,21 @@ export class VectorIso3
         return new VectorIso3(this.x - x, this.y - y, this.z - z)
     }
 
-    public setValueAt(x?: number, y?: number, z?: number)
+    public setValueAt(x?: number, y?: number, z?: number): VectorIso3
+    public setValueAt(selector: (x: VectorIso3) => number): VectorIso3
+
+    public setValueAt(initial: ((x: VectorIso3) => number) | number, y?: number, z?: number): VectorIso3
     {
-        return new VectorIso3(x == undefined ? this.x : x, y == undefined ? this.y : y, z == undefined ? this.z : z)
+        if (typeof initial != 'function')
+        {
+            return new VectorIso3(initial == undefined ? this.x : initial, y == undefined ? this.y : y, z == undefined ? this.z : z)
+        }
+        else
+        {
+            const output = new VectorIso3(this.x, this.y, this.z)
+            initial(output)
+            return output
+        }
     }
 
     public offSetValueAt(x: number = 0, y: number = 0, z: number = 0)
@@ -53,10 +65,12 @@ export class VectorIso3
         return new VectorIso3(this.x * value, this.y * value, this.z * value)
     }
 
-    public cascade(setter: (self: this) => void)
+    public cascade(setter: (self: VectorIso3) => void)
     {
-        setter(this)
-        return this
+        const { x, y, z } = this
+        const output = new VectorIso3(x, y, z)
+        setter(output)
+        return output
     }
 
     public round(precision: number)
