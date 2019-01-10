@@ -20,13 +20,13 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@babel/polyfill": "7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@types/webpack-env": "^1.13.6",
     "cssnano": "^4.1.8",
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
     "phaser-ce": "^2.11.1"
   }
 }

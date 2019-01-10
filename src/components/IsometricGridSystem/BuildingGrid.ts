@@ -3,6 +3,7 @@ import { IGridBase } from "./core/IGridBase";
 import { IGridBlock } from "./core/IGridBlock";
 import { IGridCell } from "./core/IGridCell";
 import { IGridContext } from "./core/IGridContext";
+import { IGridObject } from "./core/IGridObject";
 
 import { VectorIso3 } from "./entities/VectorIso3";
 import { GridBase } from "./GridBase";
@@ -12,7 +13,7 @@ import { GameObject } from "/components/GameObject";
 
 export class BuildingGrid extends GameObject implements IBuildingGrid
 {
-    public readonly extensionsFlat: IGridBase[]
+    public readonly gridBases: IGridBase[]
     public readonly blocks: IGridBlock[] = []
     public readonly gridCell: IGridCell
     public readonly gridDots: GridDots
@@ -36,32 +37,30 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             .map((x, i) => x == rowMax ? rowTarget(i) : x)
             .reverse()
 
-        const coordinates = totalRange
-            .map(x =>
+        const coordinates = totalRange.map(x => Enumerable.range(0, rows[x])
+            .map(y =>
             {
-                return Enumerable.range(0, rows[x])
-                    .map(y =>
-                    {
-                        const xPoint = x < spreadSizeX ? -x + y : x - spreadSizeX * 2 + 2 + y
-                        const coordinate = new VectorIso3(xPoint, x)
-                        return { grid: coordinate, screen: coordinate.to2D(gridCell.sideLength) }
-                    })
+                const xPoint = x < spreadSizeX ? -x + y : x - spreadSizeX * 2 + 2 + y
+                const coordinate = new VectorIso3(xPoint, x)
+                return { grid: coordinate, screen: coordinate.to2D(gridCell.sideLength) }
             })
-            .flat()
+        )
 
+        this.gridBases = coordinates.flatMap(f => f.map(x => new GridBase(gridContext, x.grid)
+            .setPosition(x.screen.x, x.screen.y)
+            .withParent(this)
+        ))
 
-        this.extensionsFlat = coordinates.map(x => new GridBase(gridContext, x.grid).setPosition(x.screen.x, x.screen.y).withParent(this))
-
-        this.gridDots = new GridDots(gridContext, this.extensionsFlat).withParent(this)
+        this.gridDots = new GridDots(gridContext, this.gridBases).withParent(this)
 
         gridContext.onGridHover.add(() => 
         {
-            this.extensionsFlat.forEach(x => x.ensurePointerHover())
+            this.gridBases.forEach(x => x.ensurePointerHover())
         })
 
         gridContext.onGridClick.add(() => 
         {
-            const reverseGrid = this.extensionsFlat.slice().reverse()
+            const reverseGrid = this.gridBases.slice().reverse()
             for (const item of reverseGrid)
             {
                 const position = item.ensurePointerClick()
@@ -73,15 +72,23 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             }
         })
 
+
+        const getMinMax = <T>(selector: (x: T) => number, comparer: (x: number, y: number) => boolean) => (x: T, y: T) => comparer(selector(x), selector(y)) ? x : y
+        const reducer = (selector: (x: IGridBase) => number, comparer: (x: number, y: number) => boolean) => this.gridBases.reduce(getMinMax(selector, comparer)).gridPosition
+        const [gridX, gridY] = [<T extends IGridObject>(x: T) => x.gridPosition.x, <T extends IGridObject>(x: T) => x.gridPosition.y]
+        const [moreThan, LessThan] = [(x: number, y: number) => x > y, (x: number, y: number) => x < y]
+
         this.minMax =
             {
-                maxX: this.extensionsFlat.reduce((x, y) => x.gridPosition.x > y.gridPosition.x ? x : y).gridPosition,
-                minX: this.extensionsFlat.reduce((x, y) => x.gridPosition.x < y.gridPosition.x ? x : y).gridPosition,
-                maxY: this.extensionsFlat.reduce((x, y) => x.gridPosition.y > y.gridPosition.y ? x : y).gridPosition,
-                minY: this.extensionsFlat.reduce((x, y) => x.gridPosition.y < y.gridPosition.y ? x : y).gridPosition
+                maxX: reducer(gridX, moreThan),
+                minX: reducer(gridX, LessThan),
+                maxY: reducer(gridY, moreThan),
+                minY: reducer(gridY, LessThan)
             }
 
         this.gridCenter = new VectorIso3((this.minMax.maxX.x + this.minMax.minX.x) / 2, (this.minMax.maxY.y + this.minMax.minY.y) / 2).round(1)
+
+        this.addBlock(this.gridCenter)
     }
 
 
@@ -92,29 +99,38 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         if (base)
         {
             const targetPosition = base.position
-            this.blocks.push(new GridBlock(this.gridContext, base.gridPosition)
+
+            const block = new GridBlock(this.gridContext, base.gridPosition)
                 .withParent(this)
-                .setPosition(targetPosition.x, targetPosition.y))
+                .setPosition(targetPosition.x, targetPosition.y)
+
+            this.blocks.push(block)
             this.sortBlocks()
         }
         else
         {
             debugLog(`Invalid grid position: ${position}`, "WARNING")
         }
+
         return this
     }
 
     getBase(position: VectorIso3)
     {
-        return this.extensionsFlat.find(x => x.gridPosition.equals(position))
+        return this.getGridObject(position, this.gridBases)
+    }
+
+    private getGridObject<T extends IGridObject>(position: VectorIso3, objects: T[])
+    {
+        return objects.find(x => x.gridPosition.equals(position))
     }
 
     private sortBlocks(): void
     {
         console.time("Sorting blocks")
-        this.extensionsFlat.forEach(x => 
+        this.gridBases.forEach(x => 
         {
-            const block = this.blocks.find(y => y.gridPosition.equals(x.gridPosition))
+            const block = this.getGridObject(x.gridPosition, this.blocks)
             if (block)
             {
                 this.bringToTop(block)

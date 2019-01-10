@@ -6,7 +6,7 @@ import { IGridBlock } from "./IGridBlock";
 
 export interface IBuildingGrid extends GameObject
 {
-    readonly extensionsFlat: IGridBase[]
+    readonly gridBases: IGridBase[]
     readonly blocks: IGridBlock[]
     readonly gridCell: IGridCell
     readonly gridDots: Phaser.Group

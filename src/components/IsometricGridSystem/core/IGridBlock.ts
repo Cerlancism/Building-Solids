@@ -1,7 +1,7 @@
 import { GameObject } from "/components/GameObject";
-import { VectorIso3 } from "../entities/VectorIso3";
+import { IGridObject } from "./IGridObject";
 
-export interface IGridBlock extends GameObject
+export interface IGridBlock extends GameObject, IGridObject
 {
-    gridPosition: VectorIso3
+
 }
