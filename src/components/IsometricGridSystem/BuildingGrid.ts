@@ -25,22 +25,27 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         super()
         const gridCell = this.gridCell = gridContext.gridCell
 
-        const totalRange = Enumberable.range(0, spreadSizeX + spreadSizeY - 1)
-        const rowMax = totalRange.map(x => x * 2 + 1)[Math.min(spreadSizeX, spreadSizeY) - 1]
-        const rows = totalRange.map(x => Math.min(x * 2 + 1, rowMax))
+        const totalRange = Enumerable.range(0, spreadSizeX + spreadSizeY - 1)
+
+        const oddMore = (x: number) => x * 2 + 1
+        const rowTarget = (x: number) => Math.min(oddMore(x), rowMax)
+
+        const rowMax = totalRange.map(oddMore)[Math.min(spreadSizeX, spreadSizeY) - 1]
+        const rows = totalRange.map(rowTarget)
             .reverse()
-            .map((x, i) => x == rowMax ? Math.min(i * 2 + 1, rowMax) : x)
+            .map((x, i) => x == rowMax ? rowTarget(i) : x)
             .reverse()
 
         const coordinates = totalRange
             .map(x =>
             {
-                return Enumberable.range(0, rows[x]).map(y =>
-                {
-                    const xPoint = x < spreadSizeX ? -x + y : x - spreadSizeX * 2 + 2 + y
-                    const coordinate = new VectorIso3(xPoint, x)
-                    return { grid: coordinate, screen: coordinate.to2D(gridCell.sideLength) }
-                })
+                return Enumerable.range(0, rows[x])
+                    .map(y =>
+                    {
+                        const xPoint = x < spreadSizeX ? -x + y : x - spreadSizeX * 2 + 2 + y
+                        const coordinate = new VectorIso3(xPoint, x)
+                        return { grid: coordinate, screen: coordinate.to2D(gridCell.sideLength) }
+                    })
             })
             .flat()
 

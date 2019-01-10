@@ -21,13 +21,18 @@ export class SolidBuilding extends Phaser.State
     {
         this.grid = new BuildingGrid(new GridContext(40), 10, 13).setPosition(this.world.centerX * 2 - 100, 50)
 
-        const test = this.add.graphics(10, 10).beginFill(0x000000).drawRect(20, 20, 20, 20)
-        this.add.tween(test).to({ x: this.world.width - 90 }, 1000, Phaser.Easing.Quadratic.InOut, true, 0, -1, true)
+        this.add.tween(this.add
+            .sprite(10, 10, new Phaser.Graphics(this.game)
+                .beginFill(0x000000)
+                .drawRect(20, 20, 20, 20)
+                .generateTexture()))
+            .to({ x: this.world.width - 90 }, 1000, Phaser.Easing.Quadratic.InOut, true, 0, -1, true)
 
         this.time.events.repeat(333, Infinity, () =>
         {
             this.deltaTimeLog = this.deltaTimeLog.length > 333 ? this.deltaTimeLog.slice(this.deltaTimeLog.length / 2, this.deltaTimeLog.length) : this.deltaTimeLog
             this.deltaTimeText = (this.deltaTimeLog.reduce((x, y) => x + y) / this.deltaTimeLog.length).toString() + ` ms  log length: ${this.deltaTimeLog.length}`
+            this.game.debug.text('Delta Time: ' + this.deltaTimeText, 10, 10, "#00ff00");
         })
     }
 
@@ -38,6 +43,6 @@ export class SolidBuilding extends Phaser.State
 
     render()
     {
-        this.game.debug.text('Delta Time: ' + this.deltaTimeText, 10, 10, "#00ff00");
+
     }
 }

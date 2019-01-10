@@ -1,26 +1,29 @@
-import 'babel-polyfill'
 import '/global'
 
 const { Boot, Preloader, SolidBuilding } = require<{ [keys in any]: { new(): Phaser.State } & { key: string, onCreate: Phaser.Signal } }>("/states")
 
+
 window.PROJECT_CODE = "BUILDING_SOLIDS"
 
-const buildNumberPropertyName = PROJECT_CODE + "_BuildNumber"
-const buildNumber = (JSON.parse(localStorage.getItem(buildNumberPropertyName)) || 0) as number + 1
+if (location.hostname === "localhost")
+{
+    const buildNumberPropertyName = PROJECT_CODE + "_BuildNumber"
+    const buildNumber = (JSON.parse(localStorage.getItem(buildNumberPropertyName)) || 0) as number + 1
 
-console.info(`%c[${PROJECT_CODE}] %cBuild:${buildNumber}`, "color:yellow", "color:blue; font-size:36px; font-weight:bold")
+    console.info(`%c[${PROJECT_CODE}] %cBuild:${buildNumber}`, "color:yellow", "color:blue; font-size:36px; font-weight:bold")
 
-localStorage.setItem(buildNumberPropertyName, JSON.stringify(buildNumber))
+    localStorage.setItem(buildNumberPropertyName, JSON.stringify(buildNumber))
+}
 
 !(async () =>
 {
     if (!window.GameInstance)
     {
-        window.GameInstance = await startGame()
+        window.GameInstance = await startGameAsync()
     }
 })()
 
-async function startGame()
+async function startGameAsync()
 {
     return new Promise<Phaser.Game>(resolve =>
     {
