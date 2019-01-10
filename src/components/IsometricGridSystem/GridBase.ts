@@ -2,10 +2,11 @@ import { GridBlock } from "./GridBlock";
 import { VectorIso3 } from "./entities/VectorIso3";
 import { IGridContext } from "./core/IGridContext";
 import { GridObject } from "./base/GridObject";
+import { IGridBase } from "./core/IGridBase";
 
 const DEFAULT = 0.15
 
-export class GridBase extends GridObject
+export class GridBase extends GridObject implements IGridBase
 {
     public block: GridBlock;
 

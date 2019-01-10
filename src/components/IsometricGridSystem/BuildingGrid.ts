@@ -24,7 +24,8 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     constructor(
         private readonly gridContext: IGridContext,
         spreadSizeX: number,
-        spreadSizeY: number)
+        spreadSizeY: number
+    )
     {
         super()
         const gridCell = this.gridCell = gridContext.gridCell

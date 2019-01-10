@@ -1,8 +1,9 @@
 import { IGridContext } from "./core/IGridContext";
 import { VectorIso3 } from "./entities/VectorIso3";
 import { GridObject } from "./base/GridObject";
+import { IGridBlock } from "./core/IGridBlock";
 
-export class GridBlock extends GridObject
+export class GridBlock extends GridObject implements IGridBlock
 {
     private blockDraw: Phaser.Sprite
 
