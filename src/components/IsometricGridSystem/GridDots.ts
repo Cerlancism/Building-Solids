@@ -3,9 +3,17 @@ import { IGridContext, IGridBase } from "./core";
 
 export class GridDots extends GameObject
 {
-    constructor(gridContext: IGridContext, extensions: IGridBase[])
+    constructor(gridContext: IGridContext, bases: IGridBase[])
     {
         super()
-        extensions.forEach(x => this.game.add.sprite(x.screenPosition.x, x.screenPosition.y, gridContext.dotTexture, 0, this).anchor.set(0.5))
+
+        const diameter = gridContext.dotDiameter
+        const graphic = new Phaser.Graphics(this.game).beginFill(0x000000)
+
+        bases.forEach(x => graphic.drawCircle(x.screenPosition.x, x.screenPosition.y, diameter))
+
+        const texture = graphic.generateTexture(1, Phaser.scaleModes.DEFAULT, diameter)
+
+        this.game.add.sprite(diameter * 1.5, -diameter / 2, texture, 0, this).anchor.set(1, 0)
     }
 }

@@ -44,13 +44,19 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             })
         )
 
-        this.gridBases = coordinates.flatMap(f => f.map(x => new GridBase(gridContext, x.grid).withParent(this)))
+        this.gridBases = coordinates.flatMap(r => r.map(x => new GridBase(gridContext, x.grid).withParent(this)))
 
         this.gridDots = new GridDots(gridContext, this.gridBases).withParent(this)
 
         gridContext.onGridHover.add(() => 
         {
-            this.gridBases.forEach(x => x.ensurePointerHover())
+            console.time("Sorting blocks")
+            this.gridBases.forEach(x =>
+            {
+                x.sortBlocks(this)
+                x.ensurePointerHover()
+            })
+            console.timeEnd("Sorting blocks")
         })
 
         gridContext.onGridClick.add(() => 
@@ -61,6 +67,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
                 const position = item.ensurePointerClick()
                 if (position)
                 {
+                    item.setInputActive(false)
                     this.addBlock(position)
                     return
                 }
@@ -72,7 +79,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             comparer: Functors.Comparer<number>
         ) => this.gridBases.reduce(Functors.getMinMax(selector, comparer)).gridPosition
 
-        const [selectGridX, selectGridY] = [<T extends IGridObject>(x: T) => x.gridPosition.x, <T extends IGridObject>(x: T) => x.gridPosition.y]
+        const [selectGridX, selectGridY] = [(x: IGridObject) => x.gridPosition.x, (x: IGridObject) => x.gridPosition.y]
 
         this.minMax = {
             maxX: getGridMinMax(selectGridX, Functors.moreThan),
@@ -82,8 +89,6 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         }
 
         this.gridCenter = new VectorIso3((this.minMax.maxX.x + this.minMax.minX.x) / 2, (this.minMax.maxY.y + this.minMax.minY.y) / 2).round(1)
-
-        this.addBlock(this.gridCenter)
     }
 
 
@@ -95,6 +100,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         {
             const block = new GridBlock(this.gridContext, base.gridPosition).withParent(this)
             this.blocks.push(block)
+            base.attach(block)
             this.sortBlocks()
         }
         else
@@ -120,11 +126,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         console.time("Sorting blocks")
         this.gridBases.forEach(x => 
         {
-            const block = this.getGridObject(x.gridPosition, this.blocks)
-            if (block)
-            {
-                this.bringToTop(block)
-            }
+            x.sortBlocks(this)
         })
         console.timeEnd("Sorting blocks")
     }

@@ -16,6 +16,11 @@ export class Lazy<T>
         return this.value
     }
 
+    public get hasValue()
+    {
+        return this._value != null;
+    }
+
     public get value()
     {
         return this.getValueFunc()

@@ -9,14 +9,13 @@ export class GridContext implements IGridContext
 
     public readonly baseTexturePolygon: Phaser.Polygon
     public readonly baseTexture: Phaser.RenderTexture
-    public readonly dotTexture: Phaser.RenderTexture
     public readonly blockTexture: Phaser.RenderTexture
 
     public readonly gridCell: IGridCell;
 
     constructor(
         sideLength: number,
-        dotDiameter = 5,
+        public readonly dotDiameter = 5,
         game = GameInstance)
     {
         this.gridCell = new GridCell(sideLength)
@@ -27,13 +26,7 @@ export class GridContext implements IGridContext
             .beginFill(0xAAAAAA, 1)
             .drawPolygon(this.baseTexturePolygon)
             .endFill()
-            .generateTexture()
-
-        this.dotTexture = new Phaser.Graphics(game)
-            .beginFill(0x000000, 1)
-            .drawCircle(0, 0, dotDiameter)
-            .endFill()
-            .generateTexture()
+            .generateTexture(2, Phaser.scaleModes.NEAREST)
 
         this.blockTexture = new Phaser.Graphics(game)
             .lineStyle(1, 0x000000)

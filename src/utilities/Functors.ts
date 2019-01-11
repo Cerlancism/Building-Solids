@@ -27,6 +27,11 @@ namespace Functors
     {
         return x * 2
     }
+
+    export function fuzzyRound(value: number, precision: number)
+    {
+        return Math.round(value * (1 / precision)) / (1 / precision);
+    }
 }
 
 (self as any).Functors = Functors

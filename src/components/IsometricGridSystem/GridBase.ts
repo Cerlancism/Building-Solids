@@ -1,13 +1,16 @@
 import { IGridBase, IGridBlock, IGridContext, VectorIso3 } from "./core";
 import { GridObject } from "./base";
+import { Lazy } from "/common/Lazy";
+import { GridBlock } from "./GridBlock";
 
 const DEFAULT = 0.15
 
 export class GridBase extends GridObject implements IGridBase
 {
-    public block: IGridBlock;
 
-    private graphics: Phaser.Sprite;
+    private graphics: Phaser.Sprite
+    private hintBlock: Lazy<GridBlock>
+    private block: IGridBlock
 
     constructor(
         gridContext: IGridContext,
@@ -26,6 +29,8 @@ export class GridBase extends GridObject implements IGridBase
         this.graphics.events.onInputOut.add((x: Phaser.Graphics) => this.handleInputOut(x))
         this.graphics.events.onInputUp.add((x: Phaser.Graphics, pointer: Phaser.Pointer, over: boolean) => this.handleInputUp(x, pointer, over))
         this.graphics.alpha = DEFAULT
+
+        this.hintBlock = new Lazy<GridBlock>(() => new GridBlock(gridContext, new VectorIso3()).withParent(this))
     }
 
     get screenPosition()
@@ -45,18 +50,27 @@ export class GridBase extends GridObject implements IGridBase
     private handleInputOut(x: Phaser.Graphics)
     {
         x.alpha != 1 && (x.alpha = DEFAULT);
+        this.hintBlock.value.alpha = 0;
     }
 
     private handleInputOver(x: Phaser.Graphics)
     {
         x.alpha != 1 && (x.alpha = 0.5);
+        this.hintBlock.value.alpha = 0.5;
         this.gridContext.onGridHover.dispatch();
+    }
+
+    public setInputActive(active: boolean)
+    {
+        this.graphics.inputEnabled = active
+        this.graphics.input.useHandCursor = active
     }
 
     public ensurePointerHover()
     {
         if (this.graphics.alpha == 1)
         {
+            (this.parent as Phaser.Group).sendToBack(this)
             return null
         }
         if (this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
@@ -67,6 +81,7 @@ export class GridBase extends GridObject implements IGridBase
         }
         else
         {
+            (this.parent as Phaser.Group).sendToBack(this)
             this.graphics.alpha = DEFAULT
             return null
         }
@@ -78,8 +93,19 @@ export class GridBase extends GridObject implements IGridBase
         {
             return null
         }
-        debugLog(`Clicked ${this.gridPosition}`)
+        debugLog(`${this.gridPosition}`, "Clicked")
         this.graphics.alpha = this.graphics.alpha == 1 ? 0.5 : 1
         return this.gridPosition
+    }
+
+    attach(block: IGridBlock): void
+    {
+        this.block = block
+    }
+
+    sortBlocks(parent: Phaser.Group): void
+    {
+        this.hintBlock.hasValue && this.hintBlock.value.alpha != 0 && parent.bringToTop(this)
+        this.block && parent.bringToTop(this.block)
     }
 }

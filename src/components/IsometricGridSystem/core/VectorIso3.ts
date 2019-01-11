@@ -75,11 +75,9 @@ export class VectorIso3
 
     public round(precision: number)
     {
-        function precisionRound(value: number)
-        {
-            return Math.round(value * (1 / precision)) / (1 / precision);
-        }
-        return new VectorIso3(precisionRound(this.x), precisionRound(this.y), precisionRound(this.z))
+        const rounder = (x: number) => Functors.fuzzyRound(x, precision)
+        const { x, y, z } = this
+        return new VectorIso3(rounder(x), rounder(y), rounder(z))
     }
 
     public equals(position: VectorIso3)
