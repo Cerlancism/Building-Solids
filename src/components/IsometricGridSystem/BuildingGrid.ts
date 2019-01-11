@@ -1,9 +1,10 @@
 import { GameObject } from "/extensions/phaser/";
 import { IBuildingGrid, IGridBase, IGridBlock, IGridCell, IGridContext, IGridObject, VectorIso3 } from "./core";
 
-import { GridBase } from "./GridBase";
-import { GridBlock } from "./GridBlock";
 import { GridDots } from "./GridDots";
+import { GridBlock } from "./GridBlock";
+import { GridBase } from "./GridBase";
+
 
 export class BuildingGrid extends GameObject implements IBuildingGrid
 {
@@ -24,15 +25,15 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         super()
         const gridCell = this.gridCell = gridContext.gridCell
 
-        const totalRange = Enumerable.range(0, spreadSizeX + spreadSizeY - 1)
-
         const oddPlus = (x: number) => Functors.odd(x, 1)
+        const mirrorRowTarget = (x: number, i: number) => x === rowMax ? rowTarget(i) : x
         const rowTarget = (x: number) => Math.min(oddPlus(x), rowMax)
 
+        const totalRange = Enumerable.range(0, spreadSizeX + spreadSizeY - 1)
         const rowMax = totalRange.map(oddPlus)[Math.min(spreadSizeX, spreadSizeY) - 1]
         const rows = totalRange.map(rowTarget)
             .reverse()
-            .map((x, i) => x == rowMax ? rowTarget(i) : x)
+            .map(mirrorRowTarget)
             .reverse()
 
         const coordinates = totalRange.map(x => Enumerable.range(0, rows[x])
@@ -50,13 +51,11 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
 
         gridContext.onGridHover.add(() => 
         {
-            console.time("Sorting blocks")
             this.gridBases.forEach(x =>
             {
-                x.sortBlocks(this)
                 x.ensurePointerHover()
+                x.sortBlocks(this)
             })
-            console.timeEnd("Sorting blocks")
         })
 
         gridContext.onGridClick.add(() => 

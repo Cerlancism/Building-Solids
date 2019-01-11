@@ -23,7 +23,7 @@ export class GridContext implements IGridContext
 
         this.baseTexture = new Phaser.Graphics(game)
             .lineStyle(1, 0x000000)
-            .beginFill(0xAAAAAA, 1)
+            .beginFill(0x888888, 0.5)
             .drawPolygon(this.baseTexturePolygon)
             .endFill()
             .generateTexture(2, Phaser.scaleModes.NEAREST)

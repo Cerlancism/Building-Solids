@@ -15,7 +15,7 @@
         try
         {
             var output: object | string;
-            if (typeof (message) == "string")
+            if (typeof (message) === "string")
             {
                 output = `${preFixWrapper(prefix)} ${message}`;
             }

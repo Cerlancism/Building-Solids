@@ -28,6 +28,16 @@ namespace Functors
         return x * 2
     }
 
+    export function sum(numbers: number[])
+    {
+        return numbers.reduce((x, y) => x + y, 0)
+    }
+
+    export function average(numbers: number[])
+    {
+        return sum(numbers) / numbers.length
+    }
+
     export function fuzzyRound(value: number, precision: number)
     {
         return Math.round(value * (1 / precision)) / (1 / precision);

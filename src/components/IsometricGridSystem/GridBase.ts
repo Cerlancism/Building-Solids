@@ -24,7 +24,7 @@ export class GridBase extends GridObject implements IGridBase
 
         this.graphics.hitArea = gridContext.baseTexturePolygon
 
-        this.graphics.inputEnabled = true
+        this.setInputActive(true)
         this.graphics.events.onInputOver.add((x: Phaser.Graphics) => this.handleInputOver(x))
         this.graphics.events.onInputOut.add((x: Phaser.Graphics) => this.handleInputOut(x))
         this.graphics.events.onInputUp.add((x: Phaser.Graphics, pointer: Phaser.Pointer, over: boolean) => this.handleInputUp(x, pointer, over))
@@ -50,13 +50,11 @@ export class GridBase extends GridObject implements IGridBase
     private handleInputOut(x: Phaser.Graphics)
     {
         x.alpha != 1 && (x.alpha = DEFAULT);
-        this.hintBlock.value.alpha = 0;
     }
 
     private handleInputOver(x: Phaser.Graphics)
     {
         x.alpha != 1 && (x.alpha = 0.5);
-        this.hintBlock.value.alpha = 0.5;
         this.gridContext.onGridHover.dispatch();
     }
 
@@ -68,20 +66,21 @@ export class GridBase extends GridObject implements IGridBase
 
     public ensurePointerHover()
     {
-        if (this.graphics.alpha == 1)
+        if (this.graphics.alpha === 1)
         {
             (this.parent as Phaser.Group).sendToBack(this)
             return null
         }
         if (this.graphics.input.checkPointerOver(this.game.input.activePointer, true))
         {
-
+            this.hintBlock.value.alpha = 0.5;
             this.graphics.alpha = 0.5
             return this.gridPosition
         }
         else
         {
             (this.parent as Phaser.Group).sendToBack(this)
+            this.hintBlock.value.alpha = 0;
             this.graphics.alpha = DEFAULT
             return null
         }
@@ -94,7 +93,7 @@ export class GridBase extends GridObject implements IGridBase
             return null
         }
         debugLog(`${this.gridPosition}`, "Clicked")
-        this.graphics.alpha = this.graphics.alpha == 1 ? 0.5 : 1
+        this.graphics.alpha = this.graphics.alpha === 1 ? 0.5 : 1
         return this.gridPosition
     }
 
