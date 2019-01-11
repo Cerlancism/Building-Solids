@@ -1,6 +1,6 @@
-import { IGridContext } from "../core/IGridContext";
+import { IGridContext, IGridCell } from "../core";
+
 import { GridCell } from "./GridCell";
-import { IGridCell } from "../core/IGridCell";
 
 export class GridContext implements IGridContext
 {

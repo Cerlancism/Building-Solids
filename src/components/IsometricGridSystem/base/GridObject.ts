@@ -1,7 +1,5 @@
-import { GameObject } from "../../../extensions/phaser/GameObject";
-import { IGridObject } from "../core/IGridObject";
-import { VectorIso3 } from "../entities/VectorIso3";
-import { IGridContext } from "../core/IGridContext";
+import { GameObject } from "/extensions/phaser/";
+import { IGridObject, IGridContext, VectorIso3 } from "../core";
 
 export abstract class GridObject extends GameObject implements IGridObject
 {

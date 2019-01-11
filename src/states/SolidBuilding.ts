@@ -1,7 +1,6 @@
 import { GameAssetKeys } from "/assets"
-import { BuildingGrid } from "../components/IsometricGridSystem/BuildingGrid";
-import { GridContext } from "../components/IsometricGridSystem/entities/GridContext";
-import { VectorIso3 } from "/components/IsometricGridSystem/entities/VectorIso3";
+import { BuildingGrid } from "/components/IsometricGridSystem";
+import { GridContext } from "/components/IsometricGridSystem/entities";
 
 export class SolidBuilding extends Phaser.State
 {

@@ -1,7 +1,6 @@
-import { IGridContext } from "./core/IGridContext";
-import { VectorIso3 } from "./entities/VectorIso3";
-import { GridObject } from "./base/GridObject";
-import { IGridBlock } from "./core/IGridBlock";
+import { IGridBlock, IGridContext, VectorIso3 } from "./core";
+import { GridObject } from "./base";
+
 
 export class GridBlock extends GridObject implements IGridBlock
 {

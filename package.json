@@ -6,7 +6,8 @@
   "scripts": {
     "start": "tsc & parcel serve src/index.html --out-dir dev/",
     "build": "tsc & parcel build src/index.html --out-dir build/ --public-url ./",
-    "deploy": "tsc & parcel build src/index.html --out-dir .deploy/ --public-url ./ --no-source-maps"
+    "deploy": "tsc & parcel build src/index.html --out-dir .deploy/ --public-url ./ --no-source-maps",
+    "barrel": "barrelsby -D -d ./src/ -l replace -e index.ts"
   },
   "keywords": [
     "phaser",
@@ -23,6 +24,7 @@
     "@babel/polyfill": "7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@types/webpack-env": "^1.13.6",
+    "barrelsby": "^1.0.2",
     "cssnano": "^4.1.8",
     "typescript": "^3.2.2"
   },

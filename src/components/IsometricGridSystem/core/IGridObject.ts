@@ -1,4 +1,4 @@
-import { VectorIso3 } from "../entities/VectorIso3";
+import { VectorIso3 } from "./VectorIso3";
 
 export interface IGridObject
 {

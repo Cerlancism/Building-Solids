@@ -1,5 +1,4 @@
-import { IGridCell } from "../core/IGridCell";
-import { X_POJECTON, Y_PROJECTION } from '/components/IsometricGridSystem/entities/VectorIso3'
+import { IGridCell, X_POJECTON, Y_PROJECTION } from "../core";
 
 export class GridCell implements IGridCell
 {

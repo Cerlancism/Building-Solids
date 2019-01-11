@@ -1,3 +1,3 @@
-export { Boot } from '/states/Boot'
-export { Preloader } from '/states/Preloader'
-export { SolidBuilding } from './SolidBuilding'
+export * from "./Boot";
+export * from "./Preloader";
+export * from "./SolidBuilding";

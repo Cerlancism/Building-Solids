@@ -1,15 +1,9 @@
-import { IBuildingGrid } from "./core/IBuildingGrid";
-import { IGridBase } from "./core/IGridBase";
-import { IGridBlock } from "./core/IGridBlock";
-import { IGridCell } from "./core/IGridCell";
-import { IGridContext } from "./core/IGridContext";
-import { IGridObject } from "./core/IGridObject";
+import { GameObject } from "/extensions/phaser/";
+import { IBuildingGrid, IGridBase, IGridBlock, IGridCell, IGridContext, IGridObject, VectorIso3 } from "./core";
 
-import { VectorIso3 } from "./entities/VectorIso3";
 import { GridBase } from "./GridBase";
 import { GridBlock } from "./GridBlock";
 import { GridDots } from "./GridDots";
-import { GameObject } from "../../extensions/phaser/GameObject";
 
 export class BuildingGrid extends GameObject implements IBuildingGrid
 {

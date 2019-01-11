@@ -1,6 +1,5 @@
-import { GameObject } from "../../extensions/phaser/GameObject";
-import { IGridContext } from "./core/IGridContext";
-import { IGridBase } from "./core/IGridBase";
+import { GameObject } from "/extensions/phaser/";
+import { IGridContext, IGridBase } from "./core";
 
 export class GridDots extends GameObject
 {
