@@ -1,11 +1,11 @@
 (() =>
 {
-    (window as any).debugLog = function (message: any, prefix = "DEBUG", preFixWrapper = (log: string) => `[${log}]`)
+    (self as any).debugLog = function (message: any, prefix = "DEBUG", preFixWrapper = (log: string) => `[${log}]`)
     {
         log(message, prefix, preFixWrapper, console.log);
     };
 
-    (window as any).infoLog = function (message: any)
+    (self as any).infoLog = function (message: any)
     {
         log(message, "INFO", undefined, console.info);
     };

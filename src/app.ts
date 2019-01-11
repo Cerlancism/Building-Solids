@@ -2,7 +2,7 @@ import '/global'
 
 const { Boot, Preloader, SolidBuilding } = require<{ [keys in any]: { new(): Phaser.State } & { key: string, onCreate: Phaser.Signal } }>("/states")
 
-window.PROJECT_CODE = "BUILDING_SOLIDS"
+self.PROJECT_CODE = "BUILDING_SOLIDS"
 
 if (location.hostname === "localhost")
 {
@@ -16,9 +16,9 @@ if (location.hostname === "localhost")
 
 !(async () =>
 {
-    if (!window.GameInstance)
+    if (!self.GameInstance)
     {
-        window.GameInstance = await startGameAsync()
+        self.GameInstance = await startGameAsync()
     }
 })()
 
@@ -79,10 +79,10 @@ if (module.hot)
 function destroyGame()
 {
     console.log("[HMR] Destroy Game")
-    if (window.GameInstance)
+    if (self.GameInstance)
     {
-        window.GameInstance.destroy()
-        window.GameInstance = null
+        self.GameInstance.destroy()
+        self.GameInstance = null
     }
     else
     {

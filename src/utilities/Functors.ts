@@ -29,4 +29,4 @@ namespace Functors
     }
 }
 
-(window as any).Functors = Functors
+(self as any).Functors = Functors
