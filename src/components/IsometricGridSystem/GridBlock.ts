@@ -1,6 +1,5 @@
-import { IGridBlock, IGridContext, VectorIso3, IAttachableTop } from "./core";
+import { IGridBlock, IGridContext, VectorIso3 } from "./core";
 import { GridObject } from "./base";
-
 
 export class GridBlock extends GridObject implements IGridBlock
 {
@@ -8,7 +7,7 @@ export class GridBlock extends GridObject implements IGridBlock
     private blockDraw: Phaser.Sprite
     private inputSprite: Phaser.Sprite
 
-    private hoverCallBack: Function = () => this.gridContext.onGridHover.dispatch(this)
+    private hoverBinding: Phaser.SignalBinding
 
     constructor(
         gridContext: IGridContext,
@@ -24,12 +23,17 @@ export class GridBlock extends GridObject implements IGridBlock
         inputSprite.alpha = 0
         inputSprite.anchor.set(0.5, 0)
 
-        inputSprite.events.onInputOver.add(() => this.hoverCallBack())
+        this.hoverBinding = inputSprite.events.onInputOver.add(() => this.gridContext.onGridHover.dispatch(this))
     }
 
     setTint(tint: number)
     {
         this.blockDraw.tint = tint
+    }
+
+    get allowBuild()
+    {
+        return this.blockDraw.tint === Phaser.Color.GREEN
     }
 
     get screenPosition()
@@ -44,7 +48,7 @@ export class GridBlock extends GridObject implements IGridBlock
 
         if (!active)
         {
-            this.hoverCallBack = () => { }
+            this.hoverBinding.detach()
         }
     }
 

@@ -17,7 +17,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     public readonly minMax: { minX: VectorIso3; minY: VectorIso3; maxX: VectorIso3; maxY: VectorIso3 }
     public readonly gridCenter: VectorIso3
 
-    private hoverBlock: GridObject
+    private hoverBlock: IGridBlock
 
     constructor(
         private readonly gridContext: IGridContext,
@@ -72,11 +72,16 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         {
             if (hover instanceof GridBase)
             {
-                this.setHoverBlock(hover.gridPosition)
+                const base = hover as IGridBase
+                this.setHoverBlock(hover.gridPosition, base.allowBuild ? Phaser.Color.GREEN : Phaser.Color.RED)
             }
             if (hover instanceof GridBlock)
             {
-                this.setHoverBlock(hover.gridPosition.offSetValueAt(0, 0, 1))
+                const target = hover.gridPosition.offSetValueAt(0, 0, 1)
+                const visualBlockTarget = target.offSetValueAt(-1, -1)
+                const visualBlock = this.getGridObject(visualBlockTarget, this.blocks)
+                const visualBlockBase = this.getGridObject(visualBlockTarget.offSetValueAt(0, 0, -1), this.blocks)
+                this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.RED : Phaser.Color.GREEN)
             }
         })
 
@@ -97,15 +102,41 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
                 this.game.canvas.style.cursor = "default"
                 if (this.hoverBlock.gridPosition.z === 0)
                 {
-                    this.getBase(this.hoverBlock.gridPosition).setInputActive(false)
+                    const base = this.getBase(this.hoverBlock.gridPosition)
+                    if (!base.allowBuild)
+                    {
+                        return
+                    }
+                    else
+                    {
+                        if (this.blocks.length === 0)
+                        {
+                            this.gridBases.forEach(x => x.setAllowBuild(false))
+                        }
+                        this.gridBases.filter(x => x.gridPosition.x === base.gridPosition.x
+                            && Math.abs(base.gridPosition.y - x.gridPosition.y) === 1
+                            || x.gridPosition.y === base.gridPosition.y
+                            && Math.abs(base.gridPosition.x - x.gridPosition.x) === 1
+                        )
+                            .forEach(x => x.setAllowBuild(true))
+                    }
+                    base.setInputActive(false)
                 }
                 else
                 {
+                    if (!this.hoverBlock.allowBuild)
+                    {
+                        return
+                    }
                     this.getGridObject(this.hoverBlock.gridPosition.offSetValueAt(0, 0, -1), this.blocks).setInputActive(false)
                 }
                 this.gridContext.onGridClick.dispatch(this.hoverBlock.gridPosition)
             }
         })
+
+        const getBound = (x: VectorIso3, selector: Functors.Selector<VectorIso3, number>, target: number) => Math.abs(selector(this.gridCenter) - selector(x)) < target / 3
+        const restrictGrid = (x: IGridBase) => getBound(x.gridPosition, y => y.x, spreadSizeX) && getBound(x.gridPosition, y => y.y, spreadSizeY)
+        this.gridBases.filter(restrictGrid).forEach(x => x.setAllowBuild(true))
     }
 
     addBlock(position: VectorIso3)
@@ -126,6 +157,8 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             debugLog(`Invalid grid position: ${position}`, "WARNING")
         }
 
+        debugLog(this.blocks.length, "Blocks")
+
         return this
     }
 
@@ -134,7 +167,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         return this.getGridObject(position, this.gridBases)
     }
 
-    private setHoverBlock(position: VectorIso3)
+    private setHoverBlock(position: VectorIso3, tint: number)
     {
         if (this.hoverBlock)
         {
@@ -144,7 +177,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         this.hoverBlock = new GridBlock(this.gridContext, position)
             .withParent(this)
             .cascade(x => x.alpha = 0.5)
-            .cascade(x => x.setTint(0x00FF00))
+            .cascade(x => x.setTint(tint))
         this.sortBlocks()
     }
 
@@ -157,14 +190,13 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         }
     }
 
-    private getGridObject<T extends IGridObject>(position: VectorIso3, objects: T[])
+    private getGridObject<T extends IGridObject>(position: VectorIso3, gridObjects: T[])
     {
-        return objects.find(x => x.gridPosition.equals(position))
+        return gridObjects.find(x => x.gridPosition.equals(position))
     }
 
     private sortBlocks(): void
     {
-        console.time("Sorting blocks")
         this.gridBases.forEach(x => 
         {
             x.sortBlocks(this)
@@ -176,6 +208,5 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
                 }
             }
         })
-        console.timeEnd("Sorting blocks")
     }
 }

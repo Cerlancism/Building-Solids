@@ -5,5 +5,6 @@ import { IAttachableTop } from "./IAttachableTop";
 
 export interface IGridBase extends IGridObject, IAttachableTop<IGridBlock>
 {
-
+    readonly allowBuild: boolean
+    setAllowBuild(allow: boolean): this
 }

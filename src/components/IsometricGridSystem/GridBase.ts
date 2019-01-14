@@ -1,12 +1,13 @@
 import { IGridBase, IGridBlock, IGridContext, VectorIso3 } from "./core";
 import { GridObject } from "./base";
 
-const DEFAULT = 0.15
+const DEFAULT_ALPHA = 0.15
 
 export class GridBase extends GridObject implements IGridBase
 {
     private graphics: Phaser.Sprite
     private attached: IGridBlock
+    private _allowBuild = false
 
     constructor(
         gridContext: IGridContext,
@@ -22,7 +23,7 @@ export class GridBase extends GridObject implements IGridBase
 
         this.setInputActive(true)
         this.graphics.events.onInputOver.add((x: Phaser.Graphics) => this.handleInputOver(x))
-        this.graphics.alpha = DEFAULT
+        this.graphics.alpha = 0
     }
 
     get screenPosition()
@@ -30,9 +31,9 @@ export class GridBase extends GridObject implements IGridBase
         return this.position
     }
 
-    private handleInputOut(x: Phaser.Graphics)
+    get allowBuild()
     {
-
+        return this._allowBuild
     }
 
     private handleInputOver(x: Phaser.Graphics)
@@ -57,5 +58,21 @@ export class GridBase extends GridObject implements IGridBase
         {
             this.attached.sortBlocks(parent)
         }
+    }
+
+    setAllowBuild(allow: boolean): this
+    {
+        this._allowBuild = allow
+
+        if (allow)
+        {
+            this.graphics.alpha = DEFAULT_ALPHA
+        }
+        else
+        {
+            this.graphics.alpha = 0
+        }
+
+        return this
     }
 }
