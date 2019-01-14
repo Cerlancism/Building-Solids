@@ -7,7 +7,7 @@ export class DeltaTimeDebug
     constructor(x: number = 10, y: number = 10, private readonly game?: Phaser.Game)
     {
         const [defaultGame] = Phaser.GAMES.reverse()
-        game = game || defaultGame
+        this.game = game = game || defaultGame
         this.tween = game.add.tween(game.add
             .sprite(x, x, new Phaser.Graphics(game)
                 .beginFill(0x000000)

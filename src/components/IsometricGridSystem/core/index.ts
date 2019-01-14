@@ -1,3 +1,4 @@
+export * from "./IAttachableTop";
 export * from "./IBuildingGrid";
 export * from "./IGridBase";
 export * from "./IGridBlock";

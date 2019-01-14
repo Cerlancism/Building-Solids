@@ -1,12 +1,9 @@
 import { VectorIso3 } from "./VectorIso3";
 import { IGridBlock } from "./IGridBlock";
 import { IGridObject } from "./IGridObject";
+import { IAttachableTop } from "./IAttachableTop";
 
-export interface IGridBase extends IGridObject
+export interface IGridBase extends IGridObject, IAttachableTop<IGridBlock>
 {
-    setInputActive(active: boolean): void;
-    ensurePointerHover(): VectorIso3
-    ensurePointerClick(): VectorIso3
-    attach(block: IGridBlock): void
-    sortBlocks(parent: Phaser.Group): void
+
 }
