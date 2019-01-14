@@ -4,7 +4,7 @@ export class DeltaTimeDebug
     private tween: Phaser.Tween;
     private timeEvent: Phaser.TimerEvent;
 
-    constructor(x: number = 10, y: number = 10, private readonly game?)
+    constructor(x: number = 10, y: number = 10, private readonly game?: Phaser.Game)
     {
         const [defaultGame] = Phaser.GAMES.reverse()
         game = game || defaultGame
@@ -26,7 +26,7 @@ export class DeltaTimeDebug
             const fps = 1000 / avg
             const jitter = Functors.average(parition)
             const text = `Delta time: ${avg.toFixed(2)} ms (${fps.toFixed(0)} fps)\t\tJitter: ${jitter.toFixed(2)} ms \t\tBuffer size: ${this.deltaTimeLog.length}`
-            game.debug.text(text, x, y, fps > 55 && jitter < 1 ? "#00ff00" : fps > 45 && jitter < 2 ? "#ffff00" : "#ff0000");
+            this.game.debug.text(text, x, y, fps > 55 && jitter < 1 ? "#00ff00" : fps > 45 && jitter < 2 ? "#ffff00" : "#ff0000");
             this.deltaTimeLog = this.deltaTimeLog.length > 120 ? this.deltaTimeLog.slice(this.deltaTimeLog.length / 2, this.deltaTimeLog.length) : this.deltaTimeLog
         })
     }

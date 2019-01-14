@@ -76,7 +76,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         const getGridMinMax = (
             selector: Functors.Selector<IGridBase, number>,
             comparer: Functors.Comparer<number>
-        ) => this.gridBases.reduce(Functors.getMinMax(selector, comparer)).gridPosition
+        ) => this.gridBases.reduce(Functors.selectMinMax(selector, comparer)).gridPosition
 
         const [selectGridX, selectGridY] = [(x: IGridObject) => x.gridPosition.x, (x: IGridObject) => x.gridPosition.y]
 
