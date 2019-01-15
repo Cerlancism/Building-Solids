@@ -17,6 +17,13 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     public readonly minMax: { minX: VectorIso3; minY: VectorIso3; maxX: VectorIso3; maxY: VectorIso3 }
     public readonly gridCenter: VectorIso3
 
+    /**
+     * Dispatches a boolean for the current active state
+     */
+    public readonly onEnableChanged: Phaser.Signal
+
+    public readonly onGridHover: Phaser.Signal
+
     private hoverBlock: IGridBlock
 
     constructor(
@@ -26,6 +33,9 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
     )
     {
         super()
+        this.onEnableChanged = new Phaser.Signal()
+        this.onGridHover = new Phaser.Signal()
+
         const gridCell = this.gridCell = gridContext.gridCell
 
         const oddPlus = (x: number) => Functors.odd(x, 1)
@@ -72,9 +82,9 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         this.gridContext.onGridClick.add((position: VectorIso3) => this.handleGridClick(position))
         this.game.input.onUp.add((pointer: Phaser.Pointer) => this.handleGlobalClick(pointer))
 
-        const getBound = (x: VectorIso3, selector: Functors.Selector<VectorIso3, number>, target: number) => Math.abs(selector(this.gridCenter) - selector(x)) < Math.round(target / 3)
-        const restrictGrid = (x: VectorIso3) => getBound(x, y => y.x, spreadSizeY) && getBound(x, y => y.y, spreadSizeX)
-        const alignOffset = (x: VectorIso3) => x.offSetValueAt(-Math.floor(Math.abs(spreadSizeX - spreadSizeY) / 2 - 2), -Math.floor(Math.abs(spreadSizeX - spreadSizeY) / 2 - 2))
+        const getBound = (x: VectorIso3, selector: Functors.Selector<VectorIso3, number>, target: number) => Math.abs(selector(this.gridCenter) - selector(x)) < Math.round(target / 4)
+        const restrictGrid = (x: VectorIso3) => getBound(x, y => y.x, Math.min(spreadSizeX, spreadSizeY)) && getBound(x, y => y.y, Math.min(spreadSizeX, spreadSizeY))
+        const alignOffset = (x: VectorIso3) => x
         this.gridBases
             .map(x => x.gridPosition)
             .filter(restrictGrid)
@@ -106,17 +116,19 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
                 this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.YELLOW : Phaser.Color.GREEN)
             }
         }
+        this.onGridHover.dispatch()
     }
 
     private handleGridClick(position: VectorIso3)
     {
         this.addBlock(position);
         this.destroyHoverBlock();
+        this.setEnabled(false)
     }
 
     private handleGlobalClick(pointer: Phaser.Pointer)
     {
-        if (pointer.isMouse && !pointer.leftButton.isDown)
+        if (pointer.isMouse && !pointer.leftButton.isDown && this.game.device.ieVersion != 9)
         {
             return
         }
@@ -128,6 +140,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
                 const base = this.getBase(this.hoverBlock.gridPosition)
                 if (!base.allowBuild)
                 {
+                    this.setEnabled(false)
                     return
                 }
                 else
@@ -148,6 +161,7 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             {
                 if (!this.hoverBlock.allowBuild)
                 {
+                    this.setEnabled(false)
                     return
                 }
                 this.getGridObject(this.hoverBlock.gridPosition.offSetValueAt(0, 0, -1), this.blocks).setInputActive(false)
@@ -200,6 +214,16 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             this.hoverBlock.destroy()
             this.hoverBlock = null
         }
+    }
+
+    public setEnabled(active: boolean)
+    {
+        if (!active)
+        {
+            this.destroyHoverBlock()
+        }
+        this.onEnableChanged.dispatch(active)
+        return this
     }
 
     //#endregion
