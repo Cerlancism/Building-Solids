@@ -8,6 +8,8 @@ export class GridContext implements IGridContext
     public readonly onGridClick = new Phaser.Signal()
 
     public readonly baseTexturePolygon: Phaser.Polygon
+    public readonly baseTextureTriangle: Phaser.Polygon;
+    public readonly baseTriangleTexture: Phaser.RenderTexture;
     public readonly baseTexture: Phaser.RenderTexture
     public readonly blockTexture: Phaser.RenderTexture
 
@@ -20,11 +22,19 @@ export class GridContext implements IGridContext
     {
         this.gridCell = new GridCell(sideLength)
         this.baseTexturePolygon = new Phaser.Polygon(new Phaser.Point(), this.gridCell.bottonLeft, this.gridCell.bottomCenter, this.gridCell.bottonRight)
+        this.baseTextureTriangle = new Phaser.Polygon(this.gridCell.bottonLeft, this.gridCell.bottomCenter, this.gridCell.bottonRight)
 
         this.baseTexture = new Phaser.Graphics(game)
             .lineStyle(1, 0x000000)
             .beginFill(0x888888, 0.5)
             .drawPolygon(this.baseTexturePolygon)
+            .endFill()
+            .generateTexture(2, Phaser.scaleModes.NEAREST)
+
+        this.baseTriangleTexture = new Phaser.Graphics(game)
+            .lineStyle(1, 0x000000)
+            .beginFill(0x888888, 0.5)
+            .drawPolygon(this.baseTextureTriangle)
             .endFill()
             .generateTexture(2, Phaser.scaleModes.NEAREST)
 

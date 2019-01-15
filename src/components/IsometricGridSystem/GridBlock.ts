@@ -33,7 +33,7 @@ export class GridBlock extends GridObject implements IGridBlock
 
     get allowBuild()
     {
-        return this.blockDraw.tint === Phaser.Color.GREEN
+        return this.blockDraw.tint !== Phaser.Color.RED
     }
 
     get screenPosition()

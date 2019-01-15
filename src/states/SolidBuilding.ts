@@ -1,13 +1,12 @@
 import { GameAssetKeys } from "/assets"
-import { BuildingGrid } from "/components/IsometricGridSystem";
-import { GridContext } from "/components/IsometricGridSystem/entities";
 import { DeltaTimeDebug } from "/extensions/phaser/DeltaTimeDebug";
+import { IsometricBuilder } from "/components/IsometricGridSystem";
 
 export class SolidBuilding extends Phaser.State
 {
     public static key = "SolidBuilding"
 
-    grid: BuildingGrid;
+    public builder: IsometricBuilder
 
     init()
     {
@@ -16,7 +15,7 @@ export class SolidBuilding extends Phaser.State
 
     create()
     {
-        this.grid = new BuildingGrid(new GridContext(40), 10, 13).setPosition(this.world.centerX * 2 - 100, 50)
+        this.builder = new IsometricBuilder().setPosition(30, 120)
 
         const deltaTimer = new DeltaTimeDebug()
     }

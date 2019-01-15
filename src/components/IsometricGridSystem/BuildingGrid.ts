@@ -1,11 +1,11 @@
 import { GameObject } from "/extensions/phaser/";
 import { IBuildingGrid, IGridBase, IGridBlock, IGridCell, IGridContext, IGridObject, VectorIso3 } from "./core";
-import { GridObject } from "./base";
 
 import { GridDots } from "./GridDots";
 import { GridBlock } from "./GridBlock";
 import { GridBase } from "./GridBase";
 
+const STRICT_MODE = false
 
 export class BuildingGrid extends GameObject implements IBuildingGrid
 {
@@ -68,78 +68,99 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
 
         this.gridCenter = new VectorIso3((this.minMax.maxX.x + this.minMax.minX.x) / 2, (this.minMax.maxY.y + this.minMax.minY.y) / 2).round(1)
 
-        this.gridContext.onGridHover.add((hover: IGridObject) =>
+        this.gridContext.onGridHover.add((sender: IGridObject) => this.handleHover(sender))
+        this.gridContext.onGridClick.add((position: VectorIso3) => this.handleGridClick(position))
+        this.game.input.onUp.add((pointer: Phaser.Pointer) => this.handleGlobalClick(pointer))
+
+        const getBound = (x: VectorIso3, selector: Functors.Selector<VectorIso3, number>, target: number) => Math.abs(selector(this.gridCenter) - selector(x)) < Math.round(target / 3)
+        const restrictGrid = (x: VectorIso3) => getBound(x, y => y.x, spreadSizeY) && getBound(x, y => y.y, spreadSizeX)
+        const alignOffset = (x: VectorIso3) => x.offSetValueAt(-Math.floor(Math.abs(spreadSizeX - spreadSizeY) / 2 - 2), -Math.floor(Math.abs(spreadSizeX - spreadSizeY) / 2 - 2))
+        this.gridBases
+            .map(x => x.gridPosition)
+            .filter(restrictGrid)
+            .map(alignOffset)
+            .forEach(x => this.gridBases.find(y => y.gridPosition.equals(x)).setAllowBuild(true))
+    }
+
+    //#region Handlers ----------------------------------------------------------------------------
+
+    private handleHover(sender: IGridObject)
+    {
+        if (sender instanceof GridBase)
         {
-            if (hover instanceof GridBase)
+            const base = sender as IGridBase
+            this.setHoverBlock(sender.gridPosition, base.allowBuild ? Phaser.Color.GREEN : Phaser.Color.RED)
+        }
+        if (sender instanceof GridBlock)
+        {
+            const target = sender.gridPosition.offSetValueAt(0, 0, 1)
+            const visualBlockTarget = target.offSetValueAt(-1, -1)
+            const visualBlock = this.getGridObject(visualBlockTarget, this.blocks)
+            const visualBlockBase = this.getGridObject(visualBlockTarget.offSetValueAt(0, 0, -1), this.blocks)
+            if (STRICT_MODE)
             {
-                const base = hover as IGridBase
-                this.setHoverBlock(hover.gridPosition, base.allowBuild ? Phaser.Color.GREEN : Phaser.Color.RED)
-            }
-            if (hover instanceof GridBlock)
-            {
-                const target = hover.gridPosition.offSetValueAt(0, 0, 1)
-                const visualBlockTarget = target.offSetValueAt(-1, -1)
-                const visualBlock = this.getGridObject(visualBlockTarget, this.blocks)
-                const visualBlockBase = this.getGridObject(visualBlockTarget.offSetValueAt(0, 0, -1), this.blocks)
                 this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.RED : Phaser.Color.GREEN)
             }
-        })
-
-        this.gridContext.onGridClick.add((position: VectorIso3) =>
-        {
-            this.addBlock(position)
-            this.destroyHoverBlock()
-        })
-
-        this.game.input.onUp.add((pointer: Phaser.Pointer) =>
-        {
-            if (pointer.isMouse && !pointer.leftButton.isDown)
+            else
             {
-                return
+                this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.YELLOW : Phaser.Color.GREEN)
             }
-            if (this.hoverBlock)
+        }
+    }
+
+    private handleGridClick(position: VectorIso3)
+    {
+        this.addBlock(position);
+        this.destroyHoverBlock();
+    }
+
+    private handleGlobalClick(pointer: Phaser.Pointer)
+    {
+        if (pointer.isMouse && !pointer.leftButton.isDown)
+        {
+            return
+        }
+        if (this.hoverBlock)
+        {
+            this.game.canvas.style.cursor = "default"
+            if (this.hoverBlock.gridPosition.z === 0)
             {
-                this.game.canvas.style.cursor = "default"
-                if (this.hoverBlock.gridPosition.z === 0)
+                const base = this.getBase(this.hoverBlock.gridPosition)
+                if (!base.allowBuild)
                 {
-                    const base = this.getBase(this.hoverBlock.gridPosition)
-                    if (!base.allowBuild)
-                    {
-                        return
-                    }
-                    else
-                    {
-                        if (this.blocks.length === 0)
-                        {
-                            this.gridBases.forEach(x => x.setAllowBuild(false))
-                        }
-                        this.gridBases.filter(x => x.gridPosition.x === base.gridPosition.x
-                            && Math.abs(base.gridPosition.y - x.gridPosition.y) === 1
-                            || x.gridPosition.y === base.gridPosition.y
-                            && Math.abs(base.gridPosition.x - x.gridPosition.x) === 1
-                        )
-                            .forEach(x => x.setAllowBuild(true))
-                    }
-                    base.setInputActive(false)
+                    return
                 }
                 else
                 {
-                    if (!this.hoverBlock.allowBuild)
+                    if (this.blocks.length === 0)
                     {
-                        return
+                        this.gridBases.forEach(x => x.setAllowBuild(false))
                     }
-                    this.getGridObject(this.hoverBlock.gridPosition.offSetValueAt(0, 0, -1), this.blocks).setInputActive(false)
+                    this.gridBases.filter(x => x.gridPosition.x === base.gridPosition.x
+                        && Math.abs(base.gridPosition.y - x.gridPosition.y) === 1
+                        || x.gridPosition.y === base.gridPosition.y
+                        && Math.abs(base.gridPosition.x - x.gridPosition.x) === 1)
+                        .forEach(x => x.setAllowBuild(true))
                 }
-                this.gridContext.onGridClick.dispatch(this.hoverBlock.gridPosition)
+                base.setInputActive(false)
             }
-        })
-
-        const getBound = (x: VectorIso3, selector: Functors.Selector<VectorIso3, number>, target: number) => Math.abs(selector(this.gridCenter) - selector(x)) < target / 3
-        const restrictGrid = (x: IGridBase) => getBound(x.gridPosition, y => y.x, spreadSizeX) && getBound(x.gridPosition, y => y.y, spreadSizeY)
-        this.gridBases.filter(restrictGrid).forEach(x => x.setAllowBuild(true))
+            else
+            {
+                if (!this.hoverBlock.allowBuild)
+                {
+                    return
+                }
+                this.getGridObject(this.hoverBlock.gridPosition.offSetValueAt(0, 0, -1), this.blocks).setInputActive(false)
+            }
+            this.gridContext.onGridClick.dispatch(this.hoverBlock.gridPosition)
+        }
     }
 
-    addBlock(position: VectorIso3)
+    //#endregion
+
+    //#region Mutators ----------------------------------------------------------------------------
+
+    public addBlock(position: VectorIso3)
     {
         const base = this.getBase(position) || this.getGridObject(position.offSetValueAt(0, 0, -1), this.blocks)
 
@@ -162,18 +183,9 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
         return this
     }
 
-    getBase(position: VectorIso3)
-    {
-        return this.getGridObject(position, this.gridBases)
-    }
-
     private setHoverBlock(position: VectorIso3, tint: number)
     {
-        if (this.hoverBlock)
-        {
-            this.hoverBlock.destroy()
-            this.hoverBlock = null
-        }
+        this.destroyHoverBlock()
         this.hoverBlock = new GridBlock(this.gridContext, position)
             .withParent(this)
             .cascade(x => x.alpha = 0.5)
@@ -188,6 +200,13 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             this.hoverBlock.destroy()
             this.hoverBlock = null
         }
+    }
+
+    //#endregion
+
+    public getBase(position: VectorIso3)
+    {
+        return this.getGridObject(position, this.gridBases)
     }
 
     private getGridObject<T extends IGridObject>(position: VectorIso3, gridObjects: T[])
