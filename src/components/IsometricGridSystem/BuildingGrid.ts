@@ -58,14 +58,17 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             })
         )
 
+        const blindSpots = coordinates.map(x => [x[0], x[x.length - 1]]).flatMap(x => x)
+
         this.gridBases = coordinates.flatMap(r => r.map(x => new GridBase(gridContext, x.grid).withParent(this)))
+        this.gridBases.forEach(x => blindSpots.some(y => x.gridPosition.equals(y.grid)) ? x.hardDisable() : x.setInputActive(true))
 
         this.gridDots = new GridDots(gridContext, this.gridBases).withParent(this)
 
         const getGridMinMax = (
             selector: Functors.Selector<IGridBase, number>,
             comparer: Functors.Comparer<number>
-        ) => this.gridBases.reduce(Functors.selectMinMax(selector, comparer)).gridPosition
+        ) => this.gridBases.reduce(Functors.selectiveComparison(selector, comparer)).gridPosition
 
         const [selectGridX, selectGridY] = [(x: IGridObject) => x.gridPosition.x, (x: IGridObject) => x.gridPosition.y]
 
@@ -107,14 +110,24 @@ export class BuildingGrid extends GameObject implements IBuildingGrid
             const visualBlockTarget = target.offSetValueAt(-1, -1)
             const visualBlock = this.getGridObject(visualBlockTarget, this.blocks)
             const visualBlockBase = this.getGridObject(visualBlockTarget.offSetValueAt(0, 0, -1), this.blocks)
-            if (STRICT_MODE)
+
+            !(() =>
             {
-                this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.RED : Phaser.Color.GREEN)
-            }
-            else
-            {
-                this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.YELLOW : Phaser.Color.GREEN)
-            }
+                if (target.offSetValueAt(0, 0, 1).to2D(this.gridContext.gridCell.sideLength).y <= 0)
+                {
+                    this.setHoverBlock(target, Phaser.Color.RED)
+                    return 0
+                }
+                if (STRICT_MODE)
+                {
+                    this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.RED : Phaser.Color.GREEN)
+                }
+                else
+                {
+                    this.setHoverBlock(target, visualBlock ? Phaser.Color.GREEN : visualBlockBase ? Phaser.Color.YELLOW : Phaser.Color.GREEN)
+                }
+                return 0
+            })()
         }
         this.onGridHover.dispatch()
     }

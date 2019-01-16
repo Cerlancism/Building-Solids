@@ -3,7 +3,7 @@ namespace Functors
     export type Selector<T, U> = (x: T) => U
     export type Comparer<T> = (x: T, y: T) => boolean
 
-    export function selectMinMax<T, U>(selector: Selector<T, U>, comparer: Comparer<U>)
+    export function selectiveComparison<T, U>(selector: Selector<T, U>, comparer: Comparer<U>)
     {
         return (x: T, y: T) => comparer(selector(x), selector(y)) ? x : y
     }

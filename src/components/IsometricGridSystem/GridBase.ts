@@ -1,5 +1,6 @@
 import { IGridBase, IGridBlock, IGridContext, VectorIso3 } from "./core";
 import { GridObject } from "./base";
+import { AsyncEvents } from "/extensions/phaser";
 
 const DEFAULT_ALPHA = 0.15
 
@@ -8,6 +9,7 @@ export class GridBase extends GridObject implements IGridBase
     private graphics: Phaser.Sprite
     private attached: IGridBlock
     private _allowBuild = false
+    private hardDisabled = false
 
     constructor(
         gridContext: IGridContext,
@@ -21,7 +23,6 @@ export class GridBase extends GridObject implements IGridBase
 
         this.graphics.hitArea = gridContext.baseTexturePolygon
 
-        this.setInputActive(true)
         this.graphics.events.onInputOver.add((x: Phaser.Graphics) => this.handleInputOver(x))
         this.graphics.alpha = 0
     }
@@ -43,8 +44,17 @@ export class GridBase extends GridObject implements IGridBase
 
     public setInputActive(active: boolean)
     {
-        this.graphics.inputEnabled = active
-        this.graphics.input.useHandCursor = active
+        return this.cascade(async x => 
+        {
+            if (x.hardDisabled)
+            {
+                return
+            }
+            await AsyncEvents.nextFrameAsync()
+            x.graphics.inputEnabled = active
+            x.graphics.input.useHandCursor = active
+            return
+        })
     }
 
     attach(block: IGridBlock): void
@@ -62,6 +72,10 @@ export class GridBase extends GridObject implements IGridBase
 
     setAllowBuild(allow: boolean): this
     {
+        if (this.hardDisabled)
+        {
+            return
+        }
         this._allowBuild = allow
 
         if (allow)
@@ -73,6 +87,12 @@ export class GridBase extends GridObject implements IGridBase
             this.graphics.alpha = 0
         }
 
+        return this
+    }
+
+    hardDisable(): this
+    {
+        this.hardDisabled = true
         return this
     }
 }

@@ -5,5 +5,5 @@ export interface IGridObject
     readonly gridPosition: VectorIso3
     readonly screenPosition: Phaser.Point
 
-    setInputActive(active: boolean): void;
+    setInputActive(active: boolean): this;
 }

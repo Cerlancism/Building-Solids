@@ -41,7 +41,7 @@ export class GridBlock extends GridObject implements IGridBlock
         return this.position
     }
 
-    setInputActive(active: boolean): void
+    setInputActive(active: boolean)
     {
         this.inputSprite.inputEnabled = true
         this.inputSprite.input.useHandCursor = active
@@ -50,6 +50,7 @@ export class GridBlock extends GridObject implements IGridBlock
         {
             this.hoverBinding.detach()
         }
+        return this
     }
 
     attach(attachable: IGridBlock): void

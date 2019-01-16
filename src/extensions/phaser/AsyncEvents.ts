@@ -3,7 +3,7 @@ type Signal = Phaser.Signal
 /**
  * Wrapper to convert common signal event callbacks into promises.
  */
-export namespace AsyncEvent
+export namespace AsyncEvents
 {
     /**
      * Wait for a specified game time in Phaser.
