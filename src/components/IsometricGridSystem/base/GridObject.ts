@@ -19,7 +19,7 @@ export abstract class GridObject extends GameObject implements IGridObject
         return this.position
     }
 
-    setInputActive(active: boolean): void
+    setInputActive(active: boolean): this
     {
         throw new Error("Method not implemented.");
     }

@@ -1,4 +1,4 @@
-# Phaser CE TypeScript ParcelJS
+# Phaser CE Volume of Solids
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/Cerlancism/Phaser-CE-TypeScript-ParcelJS/master/Banner.png" width="640" alt="Banner" />

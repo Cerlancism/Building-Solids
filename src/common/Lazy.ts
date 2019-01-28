@@ -1,19 +1,20 @@
 export class Lazy<T>
 {
     private _value: T
+    private getValueFunc: () => T
 
     constructor(
-        private initialiser: () => T
+        initialiser: () => T
     )
     {
         this._value = null
-    }
 
-    private getValueFunc: () => T = () =>
-    {
-        this._value = this.initialiser()
-        this.getValueFunc = () => this._value
-        return this.value
+        this.getValueFunc = () =>
+        {
+            this._value = initialiser()
+            this.getValueFunc = () => this._value
+            return this.value
+        }
     }
 
     public get hasValue()
