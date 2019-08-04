@@ -1,4 +1,3 @@
-import { GameAssetKeys } from "/assets"
 import { DeltaTimeDebug } from "/extensions/phaser/DeltaTimeDebug";
 import { IsometricBuilder } from "/components/IsometricGridSystem";
 
@@ -15,7 +14,7 @@ export class SolidBuilding extends Phaser.State
 
     create()
     {
-        this.builder = new IsometricBuilder().setPosition(30, 120)
+        this.builder = new IsometricBuilder().setPosition(40, 120)
 
         const deltaTimer = new DeltaTimeDebug()
     }

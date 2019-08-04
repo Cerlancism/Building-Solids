@@ -21,10 +21,10 @@ export class IsometricBuilder extends GameObject
     {
         super()
 
-        const spreadX = 8
-        const spreadY = 11
+        const spreadX = 12
+        const spreadY = 12
 
-        this.gridContext = new GridContext(35)
+        this.gridContext = new GridContext(60)
         const { gridCell } = this.gridContext
         const { fullWidth, sideLength } = gridCell
         const frameWidth = fullWidth * (spreadX - 1) + fullWidth / 2

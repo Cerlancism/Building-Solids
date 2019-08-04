@@ -35,8 +35,8 @@ async function startGameAsync()
             {
                 renderer: device.ie || isOffline && device.chrome ? Phaser.CANVAS : Phaser.AUTO, // IE cannot play videos in WebGL. Chrome will emit CORS errors if using WebGL offline.
                 parent: 'content',
-                width: 800,
-                height: 600,
+                width: 1280,
+                height: 960,
                 alignH: true,
                 alignV: true,
                 antialias: true,
